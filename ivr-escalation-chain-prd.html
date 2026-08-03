@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IVR Escalation Chain — customer-initiated call routing · PRD</title>
+<!--
+  GENERATED FILE — do not edit by hand.
+  Rendered from IVR_Escalation_Chain_PRD.md by build-html.js. That markdown is the single source of
+  truth; this page adds presentation only and contains no content the markdown
+  does not have. To change the spec, edit the markdown and re-run:
+      node build-html.js && node check-parity.js
+-->
+<style>
+  :root {
+    --bg: #fafaf9; --surface: #ffffff; --ink: #1a1a1a; --muted: #6b6b6b; --rule: #e5e5e2;
+    --core: #0b6b3a; --core-bg: #e9f5ee;
+    --cond: #8a5a00; --cond-bg: #fbf1dd;
+    --what: #1f3c6e; --what-bg: #e8eef8;
+    --how: #5b2a86; --how-bg: #efe6f7;
+    --guard: #b91c1c; --guard-bg: #fee2e2;
+    --required: #b91c1c; --required-bg: #fee2e2;
+    --illustrative: #6b7280; --illustrative-bg: #f1f3f5;
+    --quickcheck-bg: #fef9c3; --quickcheck-rule: #ca8a04; --quickcheck-ink: #713f12;
+    --hint-bg: #ecfeff; --hint-rule: #0e7490; --hint-ink: #155e75;
+    --delta-bg: #eef6ff; --delta-rule: #1f3c6e;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Inter", "Helvetica Neue", Arial, sans-serif; font-size: 15px; line-height: 1.55; color: var(--ink); background: var(--bg); }
+  .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+  nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; padding: 24px 18px; border-right: 1px solid var(--rule); background: var(--surface); font-size: 13px; }
+  nav.toc h2 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 18px 0 6px; }
+  nav.toc h2:first-of-type { margin-top: 0; }
+  nav.toc h2.qc { color: var(--quickcheck-ink); border-left: 3px solid var(--quickcheck-rule); padding-left: 8px; }
+  nav.toc h2.what { color: var(--what); border-left: 3px solid var(--what); padding-left: 8px; }
+  nav.toc h2.how { color: var(--how); border-left: 3px solid var(--how); padding-left: 8px; }
+  nav.toc h2.close { color: var(--muted); border-left: 3px solid var(--muted); padding-left: 8px; }
+  nav.toc ol { list-style: none; padding: 0; margin: 0; }
+  nav.toc li { margin: 4px 0; }
+  nav.toc li a { text-decoration: none; color: var(--ink); display: flex; gap: 8px; align-items: baseline; padding: 4px 6px; border-radius: 4px; font-size: 12.5px; }
+  nav.toc li a:hover { background: var(--bg); }
+  nav.toc li a .ix { color: var(--muted); font-variant-numeric: tabular-nums; min-width: 32px; font-weight: 600; }
+  nav.toc .back { display: block; margin-top: 24px; padding: 8px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 14px; text-decoration: none; }
+  nav.toc .back:hover { color: var(--ink); }
+  main { padding: 40px 56px 120px; max-width: 980px; }
+  header.doc { border-bottom: 2px solid var(--ink); padding-bottom: 20px; margin-bottom: 32px; }
+  header.doc .eyebrow { font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+  header.doc h1 { font-size: 30px; margin: 6px 0 8px; line-height: 1.2; }
+  header.doc p.lede { color: var(--muted); font-size: 15px; margin: 0; max-width: 70ch; }
+  header.doc .meta-row { display: flex; gap: 24px; margin-top: 14px; font-size: 13px; color: var(--muted); flex-wrap: wrap; }
+  .convention { margin-top: 14px; padding: 12px 14px; background: var(--bg); border: 1px dashed var(--rule); border-radius: 5px; font-size: 13px; }
+  .convention .badge { display: inline-block; padding: 2px 7px; border-radius: 3px; font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin: 0 4px; vertical-align: middle; }
+  .badge.light { background: var(--core-bg); color: var(--core); }
+  .badge.req { background: var(--required-bg); color: var(--required); }
+  .quickcheck { margin: 28px 0 40px; background: var(--quickcheck-bg); border: 1px solid var(--quickcheck-rule); border-left: 5px solid var(--quickcheck-rule); border-radius: 6px; padding: 18px 22px; }
+  .quickcheck h2 { margin: 0 0 4px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--quickcheck-ink); }
+  .quickcheck .qc-tag { font-size: 11px; color: var(--quickcheck-ink); opacity: 0.9; margin-bottom: 12px; }
+  .quickcheck dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 6px 18px; font-size: 14px; }
+  .quickcheck dt { font-weight: 600; color: var(--quickcheck-ink); }
+  .quickcheck dd { margin: 0; color: var(--ink); }
+  .part-divider { margin: 56px 0 32px; padding: 28px 32px; border-radius: 8px; color: white; }
+  .part-divider.what { background: var(--what); }
+  .part-divider.how { background: var(--how); }
+  .part-divider .label { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.8; }
+  .part-divider h2 { font-size: 28px; margin: 4px 0 6px; color: white; }
+  .part-divider p { margin: 0; font-size: 14px; opacity: 0.92; max-width: 70ch; }
+  .part-divider .author-note { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.25); font-size: 13px; font-style: italic; opacity: 0.92; }
+  section.spec { margin: 40px 0; scroll-margin-top: 24px; }
+  section.spec h2 { font-size: 21px; margin: 0 0 6px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  section.spec h2 .num { color: var(--muted); font-weight: 600; font-variant-numeric: tabular-nums; }
+  section.spec h3 { font-size: 15px; margin: 16px 0 4px; }
+  .tier { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 3px; font-weight: 600; }
+  .tier.what { background: var(--what-bg); color: var(--what); }
+  .tier.how { background: var(--how-bg); color: var(--how); }
+  .tier.guard { background: var(--guard-bg); color: var(--guard); }
+  .expected { background: #f4f4f2; border-left: 3px solid var(--ink); padding: 10px 14px; font-size: 13px; margin: 10px 0 14px; color: #333; }
+  .expected strong { font-weight: 700; }
+  .hint { background: var(--hint-bg); border-left: 3px solid var(--hint-rule); padding: 8px 14px; font-size: 13px; margin: 8px 0 14px; color: var(--hint-ink); border-radius: 4px; }
+  .row-mode { display: inline-block; margin: 6px 0 4px; padding: 3px 9px; border-radius: 3px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+  .row-mode.req { background: var(--required-bg); color: var(--required); }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 14px; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 10px; border: 1px solid var(--rule); vertical-align: top; }
+  th { background: var(--bg); font-weight: 600; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.86em; background: var(--bg); padding: 0.08em 0.32em; border-radius: 3px; border: 1px solid var(--rule); }
+  table.delta th.before { background: #f3f4f6; }
+  table.delta th.after { background: var(--delta-bg); color: var(--delta-rule); }
+  .gherkin { background: var(--surface); border: 1px solid var(--rule); border-left: 3px solid var(--core); padding: 12px 14px; margin: 10px 0; font-size: 13.5px; }
+  .gherkin pre { background: none; border: none; padding: 0; margin: 0; font-size: inherit; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .gherkin .kw { font-weight: 700; color: var(--core); }
+  table.coverage th { background: var(--bg); }
+  table.coverage td.cls { font-weight: 600; }
+  hr.sect-end { border: none; border-top: 1px dashed var(--rule); margin: 32px 0 0; }
+  footer.checklist { margin-top: 60px; padding-top: 30px; border-top: 2px solid var(--ink); }
+  footer.checklist h2 { font-size: 20px; margin-top: 0; }
+  footer.checklist table { font-size: 13.5px; }
+  footer.checklist td.tier-cell { width: 110px; }
+  footer.checklist td.check { width: 80px; text-align: center; font-family: monospace; }
+  footer.note { margin-top: 24px; padding: 14px; background: var(--bg); border-left: 3px solid var(--ink); font-size: 13px; }
+  @media print {
+    nav.toc { display: none; }
+    .layout { grid-template-columns: 1fr; }
+    main { padding: 20px; max-width: none; }
+    section.spec, .part-divider, .quickcheck { page-break-inside: avoid; }
+  }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    nav.toc { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--rule); }
+    main { padding: 24px; }
+  }
+
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="toc" aria-label="Table of contents">
+  <h2 class="what"><a href="#1-objective-definition-of-success">1. Objective &amp; Definition of Success</a></h2>
+  <ol><li><a href="#guardrails-promises-that-hold-on-every-path"><span class="ix"></span>Guardrails — promises that hold on every path</a></li></ol>
+  <ol><li><a href="#success-metrics"><span class="ix"></span>Success metrics</a></li></ol>
+  <h2 class="what"><a href="#2-user-stories-rules">2. User Stories &amp; Rules</a></h2>
+  <h2 class="what"><a href="#3-system-behaviour">3. System Behaviour</a></h2>
+  <ol><li><a href="#3a-system-flow-chart"><span class="ix"></span>3a. System flow chart</a></li></ol>
+  <ol><li><a href="#3b-state-transition-table-canon"><span class="ix"></span>3b. State transition table — canon</a></li></ol>
+  <h2 class="what"><a href="#4-screen-requirements">4. Screen Requirements</a></h2>
+  <ol><li><a href="#ivr-ops-dashboard-phase-1-view-ai-generated-revi"><span class="ix"></span>IVR ops dashboard — Phase-1 view ⚠️ *AI GENERATED — review*</a></li></ol>
+  <h2 class="what"><a href="#5-configurability">5. Configurability</a></h2>
+  <h2 class="what"><a href="#6-measurement">6. Measurement</a></h2>
+  <h2 class="what"><a href="#7-acceptance-criteria">7. Acceptance Criteria</a></h2>
+  <ol><li><a href="#chn-chain-creation-and-rung-1-t1-t7-t8"><span class="ix"></span>CHN — Chain creation and rung 1 (T1, T7, T8)</a></li></ol>
+  <ol><li><a href="#esc-escalation-and-connection-t2-t3"><span class="ix"></span>ESC — Escalation and connection (T2, T3)</a></li></ol>
+  <ol><li><a href="#end-chain-endings-t4-t5"><span class="ix"></span>END — Chain endings (T4, T5)</a></li></ol>
+  <ol><li><a href="#wf-workflows-t1-t3-t2-t1-t3-t4"><span class="ix"></span>WF — Workflows (T1 → T3 → T2; T1 → T3 → T4)</a></li></ol>
+  <ol><li><a href="#fail-failure-envelopes-t8"><span class="ix"></span>FAIL — Failure envelopes (T8)</a></li></ol>
+  <ol><li><a href="#reg-regression-1-boundary"><span class="ix"></span>REG — Regression (§1 Boundary)</a></li></ol>
+  <ol><li><a href="#race-simultaneity-3a-precedence-rules"><span class="ix"></span>RACE — Simultaneity (§3a precedence rules)</a></li></ol>
+  <ol><li><a href="#dup-duplicate-triggers"><span class="ix"></span>DUP — Duplicate triggers</a></li></ol>
+  <ol><li><a href="#bv-boundary-values-chain-length"><span class="ix"></span>BV — Boundary values (chain length)</a></li></ol>
+  <ol><li><a href="#cfg-configurability"><span class="ix"></span>CFG — Configurability</a></li></ol>
+  <ol><li><a href="#grd-guardrails"><span class="ix"></span>GRD — Guardrails</a></li></ol>
+  <h2 class="what"><a href="#8-glossary">8. Glossary</a></h2>
+  <h2 class="what"><a href="#9-notes-for-system-capabilities">9. Notes for System Capabilities</a></h2>
+  <h2 class="what"><a href="#ai-generated-content-for-review">AI-generated content for review</a></h2>
+  <h2 class="what"><a href="#overrides">Overrides</a></h2>
+  <a class="back" href="./IVR_Escalation_Chain_PRD.md">&larr; Markdown source (canon)</a>
+</nav>
+
+<main>
+
+<header class="doc">
+  <div class="eyebrow">Wiom &middot; PRD &middot; Template v3</div>
+  <h1>IVR Escalation Chain — customer-initiated call routing</h1>
+</header>
+
+<table class="delta"><tbody><tr><td><strong>Owner</strong> — Ashish Raj (PM)</td><td><strong>Reviewer</strong> — TBD (Eng Lead) ⚠️ <em>AI GENERATED — review</em></td><td><strong>Status</strong> — Draft</td><td><strong>Sign-off</strong> — Pending</td></tr><tr><td><strong>Version</strong> — v0.1 · 3 Aug 2026</td><td><strong>Consulted — CSP Ops</strong> — TBD ⚠️ <em>AI GENERATED — review</em></td><td><strong>Consulted — Telephony (Exotel)</strong> — TBD ⚠️ <em>AI GENERATED — review</em></td><td><strong>Consulted — Partner Platform</strong> — TBD ⚠️ <em>AI GENERATED — review</em></td></tr></tbody></table>
+<hr class="sect-end">
+<section class="spec" id="1-objective-definition-of-success">
+<h2><span class="num">1.</span> Objective &amp; Definition of Success</h2>
+<p><strong>Objective.</strong> A customer who calls about their restore or pickup ticket reaches a person at their own CSP — if the assigned technician does not answer, the call moves on by itself to his manager and then to the owner, and the customer does nothing but wait.</p>
+<p><strong>Boundary.</strong> This spec governs <strong>customer-initiated</strong> IVR calls on Service (restore) and Pickup tickets for CSPs in the Phase-1 cohort (C-01, C-03). It leaves unchanged:</p>
+<ul><li><strong>CSP-initiated calls</strong> to customers — a separate PRD covers reaching the customer on a second number (AC-REG-1).</li><li><strong>Install tickets</strong> — out of scope; install already connects at a higher rate and is the source of this spec's target (AC-REG-4). ⚠️ <em>AI GENERATED — review</em></li><li><strong>Calls on a ticket with no technician assigned</strong> — today's behaviour stands, untouched (T6, AC-REG-2).</li><li><strong>Bridge-rate behaviour</strong> — caller identification, PIN entry and dead-end handling are governed by the existing IVR product spec and its Phase-1 RCA (AC-REG-3).</li><li><strong>What the answering person is told about the call</strong> — no ticket context, customer name or escalation indicator is delivered to any rung. Out of scope (AC-REG-5).</li><li><strong>Ring durations</strong> — how long each rung rings, and the total ringing a customer hears, are Exotel applet configuration, not parameters of this spec (see Overrides).</li></ul>
+<h3 id="guardrails-promises-that-hold-on-every-path">Guardrails — promises that hold on every path</h3>
+<table><thead><tr><th>ID</th><th>Guardrail</th><th>One line</th><th>Anchors</th></tr></thead><tbody><tr><td>G1</td><td><strong>Invisible escalation</strong></td><td>The chain advances on its own; the customer never presses a key, redials or is told to try again.</td><td>R1 · AC-GRD-1 · MQ-2</td></tr><tr><td>G2</td><td><strong>The technician is always first</strong></td><td>Every chain starts at the assigned technician, so escalation never becomes the normal route into a CSP.</td><td>R2 · AC-GRD-2 · MQ-3 · MQ-7</td></tr><tr><td>G3</td><td><strong>One dial per person</strong></td><td>No person is dialled twice in the same chain, however many roles they hold.</td><td>R3 · AC-GRD-3 · MQ-4</td></tr><tr><td>G4</td><td><strong>Never outside the ticket's CSP</strong></td><td>The chain only ever dials users of the CSP that owns the ticket — no other CSP's staff, no Wiom staff.</td><td>R6 · AC-GRD-4 · MQ-6</td></tr></tbody></table>
+<h3 id="success-metrics">Success metrics</h3>
+<p>Ticket-level connect rate is defined in §8. A ticket where the customer hung up before any rung answered <strong>counts as not connected</strong> (T5, MQ-5).</p>
+<table><thead><tr><th>ID</th><th>Metric</th><th>Baseline</th><th>Target</th><th>Source</th></tr></thead><tbody><tr><td>M1</td><td>Ticket-level connect rate — customer-initiated, <strong>Service</strong></td><td>50.2% <em>(2 Jul – 3 Aug 2026, Phase-1 cohort)</em></td><td>69.0%</td><td>MQ-1</td></tr><tr><td>M2</td><td>Ticket-level connect rate — customer-initiated, <strong>Pickup</strong></td><td>51.1% <em>(same window)</em></td><td>69.0%</td><td>MQ-1</td></tr></tbody></table>
+<p><strong>Where the target comes from.</strong> 69.0% is what install tickets already achieve on customer-initiated calls over the same window and cohort — the closest thing to a ceiling this direction is known to reach. It is direction-matched on purpose: install's all-directions figure (79.6%) mixes in CSP-initiated calls, and its CSP-initiated figure (75.8%) belongs to the customer-side PRD, so neither can be used here.</p>
+<table><tbody><tr><td>M3</td><td>Share of in-scope tickets that connect at <strong>rung 1</strong> (the technician)</td><td>50.2% <em>(Service — today every connect is the technician)</em></td><td>≥ 50.2% — must not fall below baseline</td><td>MQ-3</td></tr></tbody></table>
+<p>M3 is the counter-metric for M1. M1 rising while M3 falls means technicians have stopped answering and the owner is absorbing the calls — connect rate would improve while service got worse, because an owner answering does not restore anyone's line.</p>
+<p><strong>Do not derive M1's target from independence.</strong> Three rungs each answering at ~50% gives 87.5% only if the three failures are unrelated. If a common cause suppresses all three, the chain moves M1 very little. MQ-3 measures per-rung answer rate so this is known within a month of launch rather than assumed.</p>
+<p><strong>Invariant (not a metric):</strong> G2 — chains where an assigned technician was not rung 1 = 0, zero tolerance. Monitored via MQ-7, not trended.</p>
+<p><strong>Invariant (not a metric):</strong> G4 — people dialled who do not belong to the ticket's CSP = 0, zero tolerance. Monitored via MQ-6, not trended.</p>
+<hr class="sect-end">
+</section>
+<section class="spec" id="2-user-stories-rules">
+<h2><span class="num">2.</span> User Stories &amp; Rules</h2>
+<table><thead><tr><th>ID</th><th>Story</th><th>MUST</th><th>MUST NOT</th></tr></thead><tbody><tr><td>R1</td><td>As a customer whose internet is down, when I call about my ticket I want to reach <em>someone</em> at my provider, not hear ringing and give up.</td><td><strong>(a)</strong> Advance to the next rung by itself when the current rung does not answer. <strong>(b)</strong> Bridge the call to the first rung that answers.</td><td><strong>(a)</strong> Ask the customer to press a key, hold, redial or call another number. <strong>(b)</strong> Tell the customer that escalation is happening or which rung is ringing.</td></tr><tr><td>R2</td><td>As a CSP owner, I want my technician to get the call first, so escalation stays the exception.</td><td>Dial the assigned technician as rung 1 on every chain (G2).</td><td>Skip, reorder or bypass the technician when one is assigned and has a number.</td></tr><tr><td>R3</td><td>As a CSP owner who is also my own technician, I do not want my phone rung three times for one call.</td><td>Dial each distinct person once; where roles resolve to the same person, shorten the chain (G3).</td><td>Dial the same number more than once in one chain.</td></tr><tr><td>R4</td><td>As a customer at a CSP that has no manager, I still want the chain to reach the owner.</td><td>Skip a rung that has no user or no number, and continue to the next rung that exists.</td><td>Fail, end or shorten the call because a rung is vacant.</td></tr><tr><td>R5</td><td>As a technician who missed a call, I want the next call on that ticket to reach me first.</td><td>Treat every inbound call as a new chain that starts at the technician.</td><td>Resume a later call part-way down the chain, or remember which rungs already failed.</td></tr><tr><td>R6</td><td>As a customer, I want my ticket discussed only with people at my own provider.</td><td>Restrict every rung to users of the CSP that owns the ticket (G4).</td><td>Dial another CSP's users, a Wiom call centre, or any number not held against this CSP.</td></tr><tr><td>R7</td><td>As a customer whose line dies at night, I want the chain to work then too.</td><td>Run the full chain at every hour of the day, every day.</td><td>Suppress, shorten or delay the chain outside working hours.</td></tr></tbody></table>
+<hr class="sect-end">
+</section>
+<section class="spec" id="3-system-behaviour">
+<h2><span class="num">3.</span> System Behaviour</h2>
+<h3 id="3a-system-flow-chart">3a. System flow chart</h3>
+<pre class="mermaid">
+flowchart TD
+    A["Customer-initiated call bridged, caller resolved to a ticket"] --&gt; B{"Ticket family in scope? (C-01)"}
+    B -- "No" --&gt; C["Existing IVR routing — outside this spec (§1 Boundary)"]
+    B -- "Yes" --&gt; D{"Chain enabled for this CSP? (C-03, C-04)"}
+    D -- "No" --&gt; C
+    D -- "Yes" --&gt; E{"Technician assigned?"}
+    E -- "No" --&gt; F["T6 — today's behaviour, unchanged (§1 Boundary)"]
+    E -- "Yes" --&gt; G{"Role list resolvable?"}
+    G -- "No" --&gt; H["T8 — dial technician only"]
+    G -- "Yes" --&gt; I{"Distinct people after dedupe?"}
+    I -- "One" --&gt; J["T7 — single-rung chain"]
+    I -- "Two or three" --&gt; K["T1 — dial rung 1"]
+    K --&gt; L{"Rung answers?"}
+    J --&gt; L
+    H --&gt; L
+    L -- "Yes" --&gt; M["T2 — connected"]
+    L -- "No" --&gt; N{"Customer still on the line?"}
+    N -- "No" --&gt; O["T5 — abandoned"]
+    N -- "Yes" --&gt; P{"A further distinct rung exists?"}
+    P -- "Yes" --&gt; Q["T3 — dial next rung"]
+    Q --&gt; L
+    P -- "No" --&gt; R["T4 — exhausted"]
+</pre>
+<p><strong>Precedence — customer hangup beats escalation.</strong> If the customer disconnects while a rung is ringing, the chain ends there and no further rung is dialled (T5, AC-RACE-1).</p>
+<p><strong>Precedence — first answer wins.</strong> If a rung answers at the same instant the chain advances, the call bridges to the rung that answered and the other dial is dropped; the customer is never bridged to two people (T2, AC-RACE-2).</p>
+<p><strong>Precedence — a ticket closing mid-chain does not stop it.</strong> A chain already ringing when its ticket closes runs to completion; ticket closure is evaluated at caller resolution, not per rung (AC-RACE-3). ⚠️ <em>AI GENERATED — review</em></p>
+<h3 id="3b-state-transition-table-canon">3b. State transition table — canon</h3>
+<p>Lifecycle of an <strong>escalation chain</strong> (created when a customer-initiated call is bridged and the caller resolves to an in-scope ticket). <strong>Each inbound call creates its own chain; no state carries between calls (R5).</strong> The ticket's own lifecycle, the caller-identification and PIN flow, and the CSP-initiated call direction are out of scope; they appear only where a chain is affected.</p>
+<table><thead><tr><th>ID</th><th>From</th><th>Action / Trigger</th><th>Rule / Check</th><th>To</th><th>Side-effects</th></tr></thead><tbody><tr><td>T1</td><td>—</td><td>Customer-initiated call bridged, caller resolved to an in-scope ticket</td><td>Ticket family in C-01; chain enabled (C-03, C-04); technician assigned with a number; role list resolves to 2 or 3 distinct people after dedupe (R3) and after skipping vacant rungs (R4)</td><td>Ringing rung 1</td><td>Technician dialled (R2, G2). Chain length after dedupe recorded (MQ-4).</td></tr><tr><td>T2</td><td>Ringing rung N</td><td>The ringing rung answers</td><td>—</td><td>Connected</td><td>Call bridged to that person (R1b). Answering rung index recorded (MQ-2, MQ-3). Terminal state.</td></tr><tr><td>T3</td><td>Ringing rung N</td><td>The ringing rung does not answer, is busy, or the dial fails</td><td>A further distinct rung exists</td><td>Ringing rung N+1</td><td>Next distinct person dialled (R3), and not before the current rung's dial has finished unanswered. No customer action and no announcement (R1a, R1 must-not(b), G1).</td></tr><tr><td>T4</td><td>Ringing rung N</td><td>The ringing rung does not answer, is busy, or the dial fails</td><td>No further rung exists</td><td>Exhausted</td><td>Existing unconnected-call handling applies, unchanged (§1 Boundary). Ticket counted as not connected (M1, MQ-5). Terminal state.</td></tr><tr><td>T5</td><td>Ringing rung N</td><td>Customer disconnects</td><td>—</td><td>Abandoned</td><td>Chain ends immediately; no further rung is dialled. Ticket counted as not connected (M1, MQ-5). Terminal state.</td></tr><tr><td>T6</td><td>—</td><td>Customer-initiated call bridged, caller resolved to an in-scope ticket</td><td>No technician assigned to the ticket</td><td>Outside this spec</td><td>Today's routing runs unchanged; no chain is created (§1 Boundary, AC-REG-2).</td></tr><tr><td>T7</td><td>—</td><td>Customer-initiated call bridged, caller resolved to an in-scope ticket</td><td>Technician, manager-tier user and owner resolve to one person after dedupe (R3)</td><td>Ringing rung 1</td><td>That person dialled once (G3). No answer routes to T4, not T3.</td></tr><tr><td>T8</td><td>—</td><td>Customer-initiated call bridged, caller resolved to an in-scope ticket</td><td>Role list cannot be resolved</td><td>Ringing rung 1</td><td><strong>Failure envelope:</strong> the call is never failed for want of a role list — it degrades to dialling the technician alone, which is today's behaviour. No answer routes to T4. How resolution is retried inside the call is the implementer's. ⚠️ <em>AI GENERATED — review</em></td></tr></tbody></table>
+<hr class="sect-end">
+</section>
+<section class="spec" id="4-screen-requirements">
+<h2><span class="num">4.</span> Screen Requirements</h2>
+<p><strong>Experience intent:</strong> the customer notices nothing. The one truth this feature reinforces is <em>someone will pick up</em> — never <em>you are being escalated</em>.</p>
+<p><strong>No customer-facing or partner-facing screen changes.</strong> G1 requires the chain be invisible, and R1's must-not bars any announcement or indicator. The Customer App, CSP App and Technician App are untouched by this spec. Ticket context for the answering rung is out of scope (§1 Boundary).</p>
+<p><strong>Master design file:</strong> none — no visual design is required. Named gap, not an omission.</p>
+<h3 id="ivr-ops-dashboard-phase-1-view-ai-generated-revi">IVR ops dashboard — Phase-1 view ⚠️ <em>AI GENERATED — review</em></h3>
+<p>Internal screen. It must show the chain's outcomes, so §6's questions have an answer and M3 stays visible.</p>
+<p><strong>States:</strong> populated (calls exist in the selected window) · empty (no calls in window) <strong>Freshness:</strong> on open, and on filter change</p>
+<table><thead><tr><th>Element</th><th>Source / Routes to</th><th>Logic</th></tr></thead><tbody><tr><td>Field — ticket-level connect rate</td><td>computed (MQ-1)</td><td>split by ticket family and by initiating side; abandoned chains count as not connected</td></tr><tr><td>Field — answering rung</td><td>escalation chain · answering rung index (§8)</td><td>rung 1 / 2 / 3 / none, per connected call (MQ-2)</td></tr><tr><td>Field — per-rung answer rate</td><td>computed (MQ-3)</td><td>feeds M3 and the independence check in §1</td></tr><tr><td>Field — chain length after dedupe</td><td>escalation chain · chain length (§8)</td><td>1, 2 or 3 (MQ-4)</td></tr><tr><td>Field — chain end state</td><td>escalation chain · end state (§8)</td><td>Connected / Exhausted / Abandoned (MQ-5)</td></tr><tr><td>Field — customer wait before answer or hangup</td><td>computed (MQ-8)</td><td>time from bridge to answer or disconnect, by rung reached</td></tr><tr><td>Check — grain guard</td><td>—</td><td>ticket-level and call-level figures are never shown in the same comparison</td></tr></tbody></table>
+<hr class="sect-end">
+</section>
+<section class="spec" id="5-configurability">
+<h2><span class="num">5.</span> Configurability</h2>
+<table><thead><tr><th>ID</th><th>Parameter</th><th>Default</th><th>Range</th><th>Who changes it</th></tr></thead><tbody><tr><td>C-01</td><td>Ticket families the chain applies to (T1)</td><td>Service, Pickup</td><td>Any subset of the ticket families the IVR serves</td><td>Product</td></tr><tr><td>C-02</td><td>Rung order and the role at each rung (R2, T1)</td><td>Rung 1 assigned technician · rung 2 manager-tier user · rung 3 owner</td><td>Fixed in V1</td><td>Product</td></tr><tr><td>C-03</td><td>CSP cohort the chain is active for (T1)</td><td>Phase-1 cohort (99 CSPs)</td><td>Any set of CSPs</td><td>Product</td></tr><tr><td>C-04</td><td>Chain enabled — kill switch (T1)</td><td>On, for the C-03 cohort</td><td>On / Off</td><td>Product + Eng ⚠️ <em>AI GENERATED — review</em></td></tr></tbody></table>
+<p><strong>No window interaction note applies.</strong> This spec owns no clocks. Per-rung ring duration and the total ringing a customer hears are Exotel applet configuration and deliberately not C-ids (see Overrides), so there are no two windows here to specify a state between. Customer wait is still measured — MQ-8 — because it is the abandonment risk this design carries.</p>
+<hr class="sect-end">
+</section>
+<section class="spec" id="6-measurement">
+<h2><span class="num">6.</span> Measurement</h2>
+<table><thead><tr><th>ID</th><th>The system must be able to answer…</th><th>Feeds</th></tr></thead><tbody><tr><td>MQ-1</td><td>Of in-scope tickets with at least one customer-initiated call, what share had at least one call where a person answered — split by ticket family. Abandoned chains count as not connected.</td><td>M1 · M2</td></tr><tr><td>MQ-2</td><td>For each chain, which rung answered — 1, 2, 3, or none — and whether that answer happened on the same inbound call the customer made.</td><td>G1 · M3</td></tr><tr><td>MQ-3</td><td>For each rung, the share of dials to that rung that were answered.</td><td>M3 · G2 · the independence check in §1</td></tr><tr><td>MQ-4</td><td>How many chains were shortened by dedupe, and to what length.</td><td>G3 · R3</td></tr><tr><td>MQ-5</td><td>How many chains ended Connected, Exhausted or Abandoned.</td><td>M1 definition · T4 · T5</td></tr><tr><td>MQ-6</td><td>Whether any person dialled in a chain did not belong to the ticket's CSP.</td><td>G4 invariant (R6)</td></tr><tr><td>MQ-7</td><td>Whether any chain dialled a rung other than the assigned technician first, where a technician was assigned and had a number.</td><td>G2 invariant (R2)</td></tr><tr><td>MQ-8</td><td>The time from bridge to answer or to customer disconnect, by the rung reached. ⚠️ <em>AI GENERATED — review</em></td><td>Abandonment risk behind M1 · R7</td></tr></tbody></table>
+<hr class="sect-end">
+</section>
+<section class="spec" id="7-acceptance-criteria">
+<h2><span class="num">7.</span> Acceptance Criteria</h2>
+<p><strong>Example data used throughout</strong> ⚠️ <em>AI GENERATED — review</em> — CSP <code>CSP-4412</code>: technician Ravi (09811100011), Manager Anil (09811100012), Owner Suresh (09811100013). Service ticket <code>TKT-88231</code> for customer Meena (09811100022). Calls on 12 Aug 2026.</p>
+<h3 id="chn-chain-creation-and-rung-1-t1-t7-t8">CHN — Chain creation and rung 1 (T1, T7, T8)</h3>
+<table><thead><tr><th>AC</th><th>Given / When / Then</th><th>Verifies</th><th>Status</th></tr></thead><tbody><tr><td>AC-CHN-1</td><td><strong>Given</strong> <code>TKT-88231</code> with Ravi assigned and Anil and Suresh on <code>CSP-4412</code>, <strong>When</strong> Meena calls at 15:20 and is resolved to that ticket, <strong>Then</strong> a chain of 3 rungs exists and Ravi's 09811100011 is the first and only number dialled.</td><td>R2 · T1 · G2</td><td>Settled</td></tr><tr><td>AC-CHN-2</td><td><strong>Given</strong> <code>CSP-4412</code> where Suresh is both owner and the assigned technician on <code>TKT-88231</code>, and Anil is the manager, <strong>When</strong> Meena calls, <strong>Then</strong> the chain has 2 rungs — Suresh then Anil — and 09811100013 is dialled exactly once.</td><td>R3 · T1 · G3</td><td>Settled</td></tr><tr><td>AC-CHN-3</td><td><strong>Given</strong> <code>CSP-4412</code> with no manager-tier user and no Manager Plus, <strong>When</strong> Meena calls, <strong>Then</strong> the chain has 2 rungs — Ravi then Suresh — and no dial is attempted against a vacant rung.</td><td>R4 · T1</td><td>Settled</td></tr><tr><td>AC-CHN-4</td><td><strong>Given</strong> a CSP where the technician, manager and owner are all Suresh, <strong>When</strong> Meena calls, <strong>Then</strong> the chain has exactly 1 rung, 09811100013 is dialled once, and on no answer the chain ends Exhausted rather than advancing.</td><td>R3 · T7 · G3</td><td>Settled</td></tr><tr><td>AC-CHN-5</td><td><strong>Given</strong> Ravi is assigned to <code>TKT-88231</code> but has no phone number on <code>CSP-4412</code>, <strong>When</strong> Meena calls, <strong>Then</strong> rung 1 is skipped without a dial and Anil's 09811100012 is dialled first.</td><td>R4 · T1</td><td>Settled</td></tr><tr><td>AC-CHN-6</td><td><strong>Given</strong> a Pickup ticket for Meena at <code>CSP-4412</code>, <strong>When</strong> she calls, <strong>Then</strong> the chain is created — Pickup is in scope (C-01).</td><td>C-01 · T1</td><td>Settled</td></tr></tbody></table>
+<h3 id="esc-escalation-and-connection-t2-t3">ESC — Escalation and connection (T2, T3)</h3>
+<table><thead><tr><th>AC</th><th>Given / When / Then</th><th>Verifies</th><th>Status</th></tr></thead><tbody><tr><td>AC-ESC-1</td><td><strong>Given</strong> the 3-rung chain from AC-CHN-1 with Ravi ringing, <strong>When</strong> Ravi answers, <strong>Then</strong> Meena is bridged to Ravi, no further number is dialled, and the answering rung is recorded as 1.</td><td>R1b · T2 · MQ-2</td><td>Settled</td></tr><tr><td>AC-ESC-2</td><td><strong>Given</strong> the same chain, <strong>When</strong> Ravi does not answer, <strong>Then</strong> Anil's 09811100012 is dialled next without Meena pressing any key, hearing any announcement, or the call dropping.</td><td>R1a · T3 · G1</td><td>Settled</td></tr><tr><td>AC-ESC-3</td><td><strong>Given</strong> Anil is then ringing, <strong>When</strong> Anil answers, <strong>Then</strong> Meena is bridged to Anil, Suresh is never dialled, and the answering rung is recorded as 2.</td><td>R1b · T2 · T3</td><td>Settled</td></tr><tr><td>AC-ESC-4</td><td><strong>Given</strong> Anil is ringing, <strong>When</strong> Anil's line is busy, <strong>Then</strong> the chain advances to Suresh — busy is treated the same as no answer.</td><td>T3</td><td>Settled</td></tr><tr><td>AC-ESC-5</td><td><strong>Given</strong> Anil is ringing, <strong>When</strong> the dial to Anil fails outright, <strong>Then</strong> the chain advances to Suresh rather than ending.</td><td>T3</td><td>Settled</td></tr><tr><td>AC-ESC-6</td><td><strong>Given</strong> the chain has reached Suresh, <strong>When</strong> Suresh answers, <strong>Then</strong> Meena is bridged to Suresh and the answering rung is recorded as 3.</td><td>T2 · MQ-2</td><td>Settled</td></tr><tr><td>AC-ESC-7</td><td><strong>Given</strong> the 3-rung chain from AC-CHN-1, <strong>When</strong> Ravi's phone is ringing, <strong>Then</strong> neither Anil's nor Suresh's phone has rung — the rungs are dialled one after another, never together.</td><td>R2 · T3 · G2</td><td>Settled</td></tr></tbody></table>
+<h3 id="end-chain-endings-t4-t5">END — Chain endings (T4, T5)</h3>
+<table><thead><tr><th>AC</th><th>Given / When / Then</th><th>Verifies</th><th>Status</th></tr></thead><tbody><tr><td>AC-END-1</td><td><strong>Given</strong> the 3-rung chain with Suresh ringing as rung 3, <strong>When</strong> Suresh does not answer, <strong>Then</strong> the chain ends Exhausted, existing unconnected-call handling runs unchanged, and <code>TKT-88231</code> counts as not connected.</td><td>T4 · M1 · MQ-5</td><td>Settled</td></tr><tr><td>AC-END-2</td><td><strong>Given</strong> Anil is ringing as rung 2, <strong>When</strong> Meena hangs up, <strong>Then</strong> the chain ends Abandoned, Suresh is never dialled, and <code>TKT-88231</code> counts as not connected.</td><td>T5 · M1 · MQ-5</td><td>Settled</td></tr><tr><td>AC-END-3</td><td><strong>Given</strong> the single-rung chain from AC-CHN-4, <strong>When</strong> Suresh does not answer, <strong>Then</strong> the chain ends Exhausted after one dial.</td><td>T7 · T4</td><td>Settled</td></tr></tbody></table>
+<h3 id="wf-workflows-t1-t3-t2-t1-t3-t4">WF — Workflows (T1 → T3 → T2; T1 → T3 → T4)</h3>
+<table><thead><tr><th>AC</th><th>Given / When / Then</th><th>Verifies</th><th>Status</th></tr></thead><tbody><tr><td>AC-WF-1</td><td><strong>Given</strong> <code>TKT-88231</code> with Ravi, Anil and Suresh, <strong>When</strong> Meena calls at 15:20, Ravi does not answer and Anil does, <strong>Then</strong> Meena has spoken to Anil on one call, was never asked to redial or press a key, and <code>TKT-88231</code> counts as connected at rung 2.</td><td>R1 · T1 · T3 · T2 · G1</td><td>Settled</td></tr><tr><td>AC-WF-2</td><td><strong>Given</strong> the same setup, <strong>When</strong> none of Ravi, Anil or Suresh answers, <strong>Then</strong> exactly three numbers were dialled in that order, the chain ends Exhausted, and <code>TKT-88231</code> counts as not connected.</td><td>T1 · T3 · T4 · M1</td><td>Settled</td></tr><tr><td>AC-WF-3</td><td><strong>Given</strong> Meena's call at 15:20 ended Exhausted, <strong>When</strong> she calls again at 15:45, <strong>Then</strong> a new chain starts at Ravi — not at Anil or Suresh.</td><td>R5 · T1</td><td>Settled</td></tr></tbody></table>
+<h3 id="fail-failure-envelopes-t8">FAIL — Failure envelopes (T8)</h3>
+<table><thead><tr><th>AC</th><th>Given / When / Then</th><th>Verifies</th><th>Status</th></tr></thead><tbody><tr><td>AC-FAIL-1</td><td><strong>Given</strong> the source of CSP roles cannot be reached when Meena calls, <strong>When</strong> the call is bridged, <strong>Then</strong> Ravi alone is dialled — the call is bridged, never failed or dropped for want of a role list.</td><td>T8</td><td>Settled</td></tr><tr><td>AC-FAIL-2</td><td><strong>Given</strong> the same failure and Ravi does not answer, <strong>When</strong> the dial completes unanswered, <strong>Then</strong> the chain ends Exhausted and existing unconnected-call handling runs — no rung 2 is invented.</td><td>T8 · T4</td><td>Settled</td></tr></tbody></table>
+<h3 id="reg-regression-1-boundary">REG — Regression (§1 Boundary)</h3>
+<table><thead><tr><th>AC</th><th>Given / When / Then</th><th>Verifies</th><th>Status</th></tr></thead><tbody><tr><td>AC-REG-1</td><td><strong>Given</strong> <code>TKT-88231</code>, <strong>When</strong> Ravi calls Meena from the CSP App, <strong>Then</strong> routing is exactly as before this spec — one destination, Meena's registered number, no chain.</td><td>§1 Boundary</td><td>Settled</td></tr><tr><td>AC-REG-2</td><td><strong>Given</strong> a Service ticket at <code>CSP-4412</code> with no technician assigned, <strong>When</strong> Meena calls, <strong>Then</strong> routing is exactly as before this spec and no chain is created.</td><td>T6 · §1 Boundary</td><td>Settled</td></tr><tr><td>AC-REG-3</td><td><strong>Given</strong> Meena calls the masked number and enters a wrong PIN, <strong>When</strong> the call reaches the dead end, <strong>Then</strong> the existing caller-identification and dead-end behaviour is unchanged — this spec begins only after a caller resolves to a ticket.</td><td>§1 Boundary</td><td>Settled</td></tr><tr><td>AC-REG-4</td><td><strong>Given</strong> an install ticket for Meena, <strong>When</strong> she calls, <strong>Then</strong> no chain is created and install routing is unchanged.</td><td>C-01 · §1 Boundary</td><td>Settled</td></tr><tr><td>AC-REG-5</td><td><strong>Given</strong> Anil answers as rung 2 on <code>TKT-88231</code>, <strong>When</strong> the call bridges, <strong>Then</strong> Anil receives no ticket reference, customer name or escalation indicator — unchanged from today.</td><td>§1 Boundary</td><td>Settled</td></tr></tbody></table>
+<h3 id="race-simultaneity-3a-precedence-rules">RACE — Simultaneity (§3a precedence rules)</h3>
+<table><thead><tr><th>AC</th><th>Given / When / Then</th><th>Verifies</th><th>Status</th></tr></thead><tbody><tr><td>AC-RACE-1</td><td><strong>Given</strong> Anil's phone is ringing as rung 2, <strong>When</strong> Meena hangs up at the same instant the chain would advance to Suresh, <strong>Then</strong> Suresh is not dialled and the chain ends Abandoned.</td><td>T5 · precedence 1</td><td>Settled</td></tr><tr><td>AC-RACE-2</td><td><strong>Given</strong> the chain is advancing from Anil to Suresh, <strong>When</strong> Anil answers at that same instant, <strong>Then</strong> Meena is bridged to exactly one person and is never on a call with both.</td><td>T2 · precedence 2</td><td>Settled</td></tr><tr><td>AC-RACE-3</td><td><strong>Given</strong> Anil is ringing as rung 2 on <code>TKT-88231</code>, <strong>When</strong> <code>TKT-88231</code> is closed at that instant, <strong>Then</strong> the chain continues to completion and Meena is still bridged if Anil answers.</td><td>precedence 3</td><td>Settled</td></tr></tbody></table>
+<h3 id="dup-duplicate-triggers">DUP — Duplicate triggers</h3>
+<table><thead><tr><th>AC</th><th>Given / When / Then</th><th>Verifies</th><th>Status</th></tr></thead><tbody><tr><td>AC-DUP-1</td><td><strong>Given</strong> Meena calls at 15:20 and is bridged to Anil at rung 2, <strong>When</strong> she calls again at 15:22, <strong>Then</strong> a second, independent chain starts at Ravi.</td><td>R5 · T1</td><td>Settled</td></tr><tr><td>AC-DUP-2</td><td><strong>Given</strong> Meena has two calls in flight on the same ticket at once, <strong>When</strong> both chains run, <strong>Then</strong> each chain dials its own rungs independently and neither shortens or skips because of the other.</td><td>R5 · T1</td><td>Settled</td></tr><tr><td>AC-DUP-3</td><td><strong>Given</strong> two different customers of <code>CSP-4412</code> call at the same moment on two Service tickets both assigned to Ravi, <strong>When</strong> both chains start, <strong>Then</strong> both dial Ravi as rung 1 and each advances on its own outcome.</td><td>R2 · T1 · T3</td><td>Settled</td></tr></tbody></table>
+<h3 id="bv-boundary-values-chain-length">BV — Boundary values (chain length)</h3>
+<table><thead><tr><th>AC</th><th>Given / When / Then</th><th>Verifies</th><th>Status</th></tr></thead><tbody><tr><td>AC-BV-1</td><td><strong>Given</strong> a CSP resolving to exactly 1 distinct person, <strong>When</strong> Meena calls, <strong>Then</strong> 1 dial is made and no escalation occurs.</td><td>R3 · T7</td><td>Settled</td></tr><tr><td>AC-BV-2</td><td><strong>Given</strong> a CSP resolving to exactly 2 distinct people, <strong>When</strong> neither answers, <strong>Then</strong> exactly 2 dials were made and the chain ends Exhausted — no third dial.</td><td>R3 · R4 · T4</td><td>Settled</td></tr><tr><td>AC-BV-3</td><td><strong>Given</strong> a CSP resolving to 3 distinct people, <strong>When</strong> none answers, <strong>Then</strong> exactly 3 dials were made and no fourth rung exists — the chain never extends past the owner.</td><td>C-02 · T4</td><td>Settled</td></tr></tbody></table>
+<h3 id="cfg-configurability">CFG — Configurability</h3>
+<table><thead><tr><th>AC</th><th>Given / When / Then</th><th>Verifies</th><th>Status</th></tr></thead><tbody><tr><td>AC-CFG-1</td><td><strong>Given</strong> <code>CSP-4412</code> is removed from the active cohort (C-03), <strong>When</strong> Meena calls, <strong>Then</strong> only Ravi is dialled and no escalation occurs.</td><td>C-03</td><td>Settled</td></tr><tr><td>AC-CFG-2</td><td><strong>Given</strong> the chain is switched off (C-04), <strong>When</strong> Meena calls, <strong>Then</strong> routing is identical to AC-REG-2's pre-spec behaviour for every in-scope ticket.</td><td>C-04</td><td>Settled</td></tr><tr><td>AC-CFG-3</td><td><strong>Given</strong> Pickup is removed from C-01, <strong>When</strong> Meena calls on a Pickup ticket, <strong>Then</strong> no chain is created, while her Service ticket still gets one.</td><td>C-01</td><td>Settled</td></tr></tbody></table>
+<h3 id="grd-guardrails">GRD — Guardrails</h3>
+<table><thead><tr><th>AC</th><th>Given / When / Then</th><th>Verifies</th><th>Status</th></tr></thead><tbody><tr><td>AC-GRD-1</td><td><strong>Given</strong> any chain that reaches rung 2 or rung 3, <strong>When</strong> the call is reviewed end to end, <strong>Then</strong> the customer heard no announcement, pressed no key, and the call was never disconnected and re-established.</td><td>G1 · R1</td><td>Settled</td></tr><tr><td>AC-GRD-2</td><td><strong>Given</strong> 1,000 chains across the cohort, <strong>When</strong> the first dial of each is checked, <strong>Then</strong> every one dialled the assigned technician where a technician was assigned and had a number.</td><td>G2 · R2 · MQ-7</td><td>Settled</td></tr><tr><td>AC-GRD-3</td><td><strong>Given</strong> any chain at a CSP where one person holds two or three of the roles, <strong>When</strong> the dial list is checked, <strong>Then</strong> no number appears twice.</td><td>G3 · R3 · MQ-4</td><td>Settled</td></tr><tr><td>AC-GRD-4</td><td><strong>Given</strong> any chain on <code>TKT-88231</code>, <strong>When</strong> every number dialled is checked against <code>CSP-4412</code>'s user list, <strong>Then</strong> all of them belong to <code>CSP-4412</code> and none is a Wiom or other-CSP number.</td><td>G4 · R6 · MQ-6</td><td>Settled</td></tr><tr><td>AC-GRD-5</td><td><strong>Given</strong> a Service ticket where Meena calls at 23:40, <strong>When</strong> Ravi does not answer, <strong>Then</strong> the chain advances to Anil and then Suresh exactly as it would at 15:20.</td><td>R7</td><td>Settled</td></tr></tbody></table>
+<hr class="sect-end">
+</section>
+<section class="spec" id="8-glossary">
+<h2><span class="num">8.</span> Glossary</h2>
+<table><thead><tr><th>Term</th><th>Meaning</th><th>Owner (domain)</th></tr></thead><tbody><tr><td>Escalation chain</td><td><strong>Canonical definition:</strong> the ordered list of distinct people dialled for one inbound customer call, and the act of moving down it when a person does not answer. Created per call, never carried between calls (R5). Carries: the ticket it belongs to, the ordered rungs after dedupe, the chain length, the answering rung index if any, and the end state (Connected / Exhausted / Abandoned).</td><td>—</td></tr><tr><td>Rung</td><td>One position in an escalation chain, and the one person dialled at that position. Rung 1 is the assigned technician, rung 2 the manager-tier user, rung 3 the owner (C-02).</td><td>—</td></tr><tr><td>Manager-tier user</td><td>The CSP user holding the Manager or the Manager Plus role. A CSP cannot hold both at once by design, so this is always at most one person, and rung 2 is whichever of the two exists.</td><td>Partner Platform</td></tr><tr><td>Ticket-level connect rate</td><td><strong>Canonical definition:</strong> of tickets that had at least one call in the chosen direction and window, the share where at least one of those calls was answered by a person. A ticket counts once however many calls it had. Not to be confused with call-level connect rate, which is per call. Comparisons must never mix the two grains.</td><td>—</td></tr><tr><td>Exhausted</td><td>A chain where every rung was dialled and none answered. Counts as not connected.</td><td>—</td></tr><tr><td>Abandoned</td><td>A chain where the customer disconnected before any rung answered. Counts as not connected (TL-9).</td><td>—</td></tr><tr><td>Service ticket</td><td>The restore ticket family — a live customer whose connection needs restoring. Called "Service" in the ops dashboard's ticket-type filter.</td><td>—</td></tr><tr><td>Pickup ticket</td><td>The netbox-recovery (NBREC) ticket family — collecting equipment from a customer.</td><td>—</td></tr><tr><td>Phase-1 cohort</td><td>The 99 CSPs on which IVR 2.0 is live, and this spec's launch scope (C-03).</td><td>—</td></tr></tbody></table>
+<hr class="sect-end">
+</section>
+<section class="spec" id="9-notes-for-system-capabilities">
+<h2><span class="num">9.</span> Notes for System Capabilities</h2>
+<p>What the platform must be able to do for this feature to exist. Whether these are one system or several, and how they interact, is the implementer's design.</p>
+<table><thead><tr><th>Capability</th><th>Needed by</th></tr></thead><tbody><tr><td>For a ticket, resolve the CSP's currently assigned technician, its manager-tier user and its owner, each with a dialable number, restricted to that CSP.</td><td>T1 · R2 · R4 · R6 · G4</td></tr><tr><td>Reduce a resolved role list to distinct people before any dial, preserving rung order.</td><td>T1 · T7 · R3 · G3</td></tr><tr><td>Dial an ordered list of destinations for one inbound call, advancing to the next on no answer, busy or dial failure, without the caller acting and without dropping the call.</td><td>T1 · T3 · R1 · G1</td></tr><tr><td>End a chain the moment the caller disconnects, dialling nothing further.</td><td>T5 · precedence 1</td></tr><tr><td>Bridge to exactly one person per call, even when an answer and an advance coincide.</td><td>T2 · precedence 2</td></tr><tr><td>Fall back to dialling the technician alone when the role list cannot be resolved, without failing the call.</td><td>T8</td></tr><tr><td>Record, per call, the chain length after dedupe, the rung that answered if any, the end state, and the caller's wait before answer or hangup.</td><td>MQ-2 · MQ-3 · MQ-4 · MQ-5 · MQ-8</td></tr><tr><td>Turn the chain on or off, and vary its ticket families and CSP cohort, without a release.</td><td>C-01 · C-03 · C-04</td></tr></tbody></table>
+<hr class="sect-end">
+</section>
+<section class="spec" id="ai-generated-content-for-review">
+<h2>AI-generated content for review</h2>
+<table><thead><tr><th>Location</th><th>What was generated</th><th>Basis</th></tr></thead><tbody><tr><td>Header</td><td>Reviewer and all three Consulted names</td><td>Not supplied. Template requires named accountability.</td></tr><tr><td>§1 Boundary</td><td>Install tickets excluded from scope</td><td>Inferred: the problem was stated as restore and pickup, and install is the benchmark. Not explicitly ruled.</td></tr><tr><td>§3a precedence 3</td><td>A ticket closing mid-chain does not stop the chain</td><td>Default. Not discussed; the alternative (yanking a ringing call) seemed clearly worse.</td></tr><tr><td>§3b T8</td><td>Failure envelope — degrade to technician-only when the role list cannot be resolved</td><td>Default. PM did not state behaviour when the gateway-service lookup fails.</td></tr><tr><td>§4</td><td>The whole IVR ops dashboard block</td><td>Inferred from §6: MQ-2 to MQ-5 and MQ-8 must be readable somewhere, and the Phase-1 dashboard is where connect rate is already read.</td></tr><tr><td>§5 C-04</td><td>Kill switch, and Eng as joint owner</td><td>Default. No rollback control was discussed; a cohort-wide behaviour change normally needs one.</td></tr><tr><td>§6 MQ-8</td><td>Customer wait before answer or hangup</td><td>Inferred. Ring durations are out of scope, but the abandonment risk they create still needs measuring.</td></tr><tr><td>§7</td><td>The whole example dataset — <code>CSP-4412</code>, Ravi, Anil, Suresh, Meena, <code>TKT-88231</code>, the numbers and the 12 Aug 2026 date</td><td>Invented. ACs need concrete data to be executable. Replace with a real CSP and ticket if you want these runnable as-is.</td></tr></tbody></table>
+<hr class="sect-end">
+</section>
+<section class="spec" id="overrides">
+<h2>Overrides</h2>
+<table><thead><tr><th>Rule</th><th>What was done instead</th><th>Rationale</th><th>Approved by</th></tr></thead><tbody><tr><td>§5 — every number that could change gets a C-id, including customer-experience latency targets even where engineering owns them</td><td>Per-rung ring duration and the total ringing the customer hears are <strong>not</strong> C-ids and appear nowhere in §5</td><td>Ring behaviour is Exotel App Bazaar applet configuration, not a parameter of this service. Consistent with the June 2026 decision to drop <code>ES_CSPIVR_CALL_BRIDGE_MAX_RING_SECONDS</code> from the IVR spec for the same reason. Customer wait is still measured via MQ-8.</td><td>Ashish Raj (PM), 3 Aug 2026</td></tr><tr><td>§4 — every screen block names a master design file</td><td>No design file; §4 states that no customer-facing or partner-facing screen changes</td><td>G1 requires the chain be invisible, so there is nothing to design. The one screen block is an internal ops view.</td><td>Ashish Raj (PM), 3 Aug 2026</td></tr><tr><td>§1 — "what does the customer see between two windows"</td><td>No in-between state specified</td><td>This spec owns no clocks, so no gap between windows exists.</td><td>Ashish Raj (PM), 3 Aug 2026</td></tr></tbody></table>
+</section>
+
+</main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  if (typeof mermaid !== 'undefined') {
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral', securityLevel: 'loose', flowchart: { curve: 'basis' } });
+  }
+</script>
+</body>
+</html>
