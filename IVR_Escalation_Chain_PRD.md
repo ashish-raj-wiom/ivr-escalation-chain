@@ -3,7 +3,7 @@
 | | | | |
 |---|---|---|---|
 | **Owner** — Ashish Raj (PM) | **Reviewer** — Rahul (Eng Lead) | **Status** — Draft | **Sign-off** — Pending |
-| **Version** — v0.4 · 4 Aug 2026 | | | |
+| **Version** — v0.5 · 4 Aug 2026 | | | |
 
 ---
 
@@ -11,7 +11,7 @@
 
 **Objective.** A customer who calls about their installation, restore or pickup ticket reaches a person at their own CSP — if the assigned executor does not answer, the call moves on by itself to that CSP's manager and then its owner, and the customer's chances of getting connected to a CSP user increase.
 
-**Boundary.** This spec governs **customer-initiated** IVR calls on Install, Service (restore) and Pickup tickets for CSPs in the Phase-1 cohort (C-01, C-03). It leaves unchanged:
+**Boundary.** This spec governs **customer-initiated** IVR calls on Install, Service (restore) and Pickup tickets — every ticket family the IVR serves — at every CSP where IVR 2.0 is live. It leaves unchanged:
 
 - **CSP-initiated calls** to customers — a separate PRD covers reaching the customer on a second number (AC-REG-1).
 - **Calls on a ticket with no executor assigned** — today's behaviour stands, untouched (T6, AC-REG-2).
@@ -39,7 +39,7 @@ Ticket-level connect rate is defined in §8. A ticket where the customer hung up
 | M3 | Ticket-level connect rate — **Install** | 69.0% | ≥ 69.0% — any gain is upside; a fall below baseline is a regression ⚠️ *AI GENERATED — review* | MQ-1 |
 | M4 | Share of in-scope tickets that connect at **rung 1** — the assigned executor | 50.2% Service · 51.1% Pickup · 69.0% Install — today every connect is the executor, because there is no second rung | No family falls below its own baseline | MQ-3 |
 
-**Where the 69.0% comes from, and why it does not move.** 69.0% is what install tickets achieved on customer-initiated calls in the window above — **before** this spec ships. It is the closest thing to a ceiling this direction is known to reach, so Service and Pickup aim at it. It is frozen as a historical mark: install is itself in scope (C-01), so install's own rate should climb past 69.0% and must not be allowed to redefine M1 and M2's target as it does. The benchmark is also direction-matched on purpose — install's all-directions figure (79.6%) mixes in CSP-initiated calls, and its CSP-initiated figure (75.8%) belongs to the customer-side PRD, so neither can be used here.
+**Where the 69.0% comes from, and why it does not move.** 69.0% is what install tickets achieved on customer-initiated calls in the window above — **before** this spec ships. It is the closest thing to a ceiling this direction is known to reach, so Service and Pickup aim at it. It is frozen as a historical mark: install is itself in scope (§1 Boundary), so install's own rate should climb past 69.0% and must not be allowed to redefine M1 and M2's target as it does. The benchmark is also direction-matched on purpose — install's all-directions figure (79.6%) mixes in CSP-initiated calls, and its CSP-initiated figure (75.8%) belongs to the customer-side PRD, so neither can be used here.
 
 Install has the least room to gain of the three families, and that is expected. It is in scope because the chain costs nothing extra to apply there and any gain is worth having.
 
@@ -73,9 +73,9 @@ Install has the least room to gain of the three families, and that is expected. 
 
 ```mermaid
 flowchart TD
-    A["Customer-initiated call bridged, caller resolved to a ticket"] --> B{"Ticket family in scope? (C-01)"}
+    A["Customer-initiated call bridged, caller resolved to a ticket"] --> B{"Ticket family served by the IVR?"}
     B -- "No" --> C["Existing IVR routing — outside this spec (§1 Boundary)"]
-    B -- "Yes" --> D{"Chain enabled for this CSP? (C-03, C-04)"}
+    B -- "Yes" --> D{"Chain enabled? (C-04)"}
     D -- "No" --> C
     D -- "Yes" --> E{"Executor assigned?"}
     E -- "No" --> F["T6 — today's behaviour, unchanged (§1 Boundary)"]
@@ -108,7 +108,7 @@ Lifecycle of an **escalation chain** (created when a customer-initiated call is 
 
 | ID | From | Action / Trigger | Rule / Check | To | Side-effects |
 |---|---|---|---|---|---|
-| T1 | — | Customer-initiated call bridged, caller resolved to an in-scope ticket | Ticket family in C-01; chain enabled (C-03, C-04); executor assigned with a number; role list resolves to 2 or 3 distinct people after dedupe (R3) and after skipping vacant rungs (R4) | Ringing rung 1 | Assigned executor dialled (R2, G2). Chain length after dedupe recorded (MQ-4). |
+| T1 | — | Customer-initiated call bridged, caller resolved to an in-scope ticket | Chain enabled (C-04); executor assigned with a number; role list resolves to 2 or 3 distinct people after dedupe (R3) and after skipping vacant rungs (R4) | Ringing rung 1 | Assigned executor dialled (R2, G2). Chain length after dedupe recorded (MQ-4). |
 | T2 | Ringing rung N | The ringing rung answers | — | Connected | Call bridged to that person (R1b). Answering rung index recorded (MQ-2, MQ-3). Terminal state. |
 | T3 | Ringing rung N | The ringing rung does not answer, is busy, or the dial fails | A further distinct rung exists | Ringing rung N+1 | Next distinct person dialled (R3), and not before the current rung's dial has finished unanswered. No customer action and no announcement (R1a, R1 must-not(b), G1). |
 | T4 | Ringing rung N | The ringing rung does not answer, is busy, or the dial fails | No further rung exists | Exhausted | Existing unconnected-call handling applies, unchanged (§1 Boundary). Ticket counted as not connected (M1, M2, M3, MQ-5). Terminal state. |
@@ -133,10 +133,15 @@ No design file is needed, because there is nothing to design.
 
 | ID | Parameter | Default | Range | Who changes it |
 |---|---|---|---|---|
-| C-01 | Ticket families the chain applies to (T1) | Install, Service, Pickup | Any subset of the ticket families the IVR serves | Product |
-| C-02 | Rung order and the role at each rung (R2, T1) | Rung 1 assigned executor · rung 2 manager-tier user · rung 3 owner | Fixed in V1 | Product |
-| C-03 | CSP cohort the chain is active for (T1) | Phase-1 cohort (99 CSPs) | Any set of CSPs | Product |
-| C-04 | Chain enabled — kill switch (T1) | On, for the C-03 cohort | On / Off | Product + Eng ⚠️ *AI GENERATED — review* |
+| C-04 | Chain enabled — kill switch (T1) | On, wherever IVR 2.0 is live | On / Off | Product + Eng ⚠️ *AI GENERATED — review* |
+
+**This spec owns one parameter, and only one.** Everything else about the chain's reach is inherited, not tuned here:
+
+- **Which CSPs get it** is wherever IVR 2.0 is already live. Rollout is the IVR service's own, and this spec does not add a second cohort control on top of it.
+- **Which ticket families get it** is every family the IVR serves — install, service and pickup, which is all of them. There is no subset to configure.
+- **The rung order** — assigned executor, then manager-tier user, then owner — is system behaviour, stated in §3b and defined in §8. It is not a tunable.
+
+So C-04 is a straight off switch for the whole feature, and nothing narrower.
 
 **No window interaction note applies.** This spec owns no clocks. Per-rung ring duration and the total ringing a customer hears are Exotel applet configuration and deliberately not C-ids (see Overrides), so there are no two windows here to specify a state between. Customer wait is still measured — MQ-8 — because it is the abandonment risk this design carries.
 
@@ -170,9 +175,9 @@ No design file is needed, because there is nothing to design.
 | AC-CHN-3 | **Given** `CSP-4412` with no manager-tier user and no Manager Plus, **When** Meena calls, **Then** the chain has 2 rungs — Ravi then Suresh — and no dial is attempted against a vacant rung. | R4 · T1 | Settled |
 | AC-CHN-4 | **Given** a CSP where the executor, manager and owner are all Suresh, **When** Meena calls, **Then** the chain has exactly 1 rung, 09811100013 is dialled once, and on no answer the chain ends Exhausted rather than advancing. | R3 · T7 · G3 | Settled |
 | AC-CHN-5 | **Given** Ravi is the executor on `TKT-88231` but has no phone number on `CSP-4412`, **When** Meena calls, **Then** rung 1 is skipped without a dial and Anil's 09811100012 is dialled first. | R4 · T1 | Settled |
-| AC-CHN-6 | **Given** a Pickup ticket for Meena at `CSP-4412`, **When** she calls, **Then** the chain is created — Pickup is in scope (C-01). | C-01 · T1 | Settled |
+| AC-CHN-6 | **Given** a Pickup ticket for Meena at `CSP-4412`, **When** she calls, **Then** the chain is created — Pickup is in scope. | T1 · §1 Boundary | Settled |
 | AC-CHN-7 | **Given** `TKT-88231` where Anil the manager is its assigned executor, **When** Meena calls, **Then** the chain has 2 rungs — Anil then Suresh — and Anil's 09811100012 is dialled first, not Ravi's. | R2 · R3 · T1 · G2 | Settled |
-| AC-CHN-8 | **Given** an install ticket for Meena at `CSP-4412` with Ravi as executor, **When** she calls, **Then** the chain is created — install is in scope (C-01). | C-01 · T1 | Settled |
+| AC-CHN-8 | **Given** an install ticket for Meena at `CSP-4412` with Ravi as executor, **When** she calls, **Then** the chain is created — install is in scope. | T1 · §1 Boundary | Settled |
 
 ### ESC — Escalation and connection (T2, T3)
 
@@ -240,15 +245,14 @@ No design file is needed, because there is nothing to design.
 |---|---|---|---|
 | AC-BV-1 | **Given** a CSP resolving to exactly 1 distinct person, **When** Meena calls, **Then** 1 dial is made and no escalation occurs. | R3 · T7 | Settled |
 | AC-BV-2 | **Given** a CSP resolving to exactly 2 distinct people, **When** neither answers, **Then** exactly 2 dials were made and the chain ends Exhausted — no third dial. | R3 · R4 · T4 | Settled |
-| AC-BV-3 | **Given** a CSP resolving to 3 distinct people, **When** none answers, **Then** exactly 3 dials were made and no fourth rung exists — the chain never extends past the owner. | C-02 · T4 | Settled |
+| AC-BV-3 | **Given** a CSP resolving to 3 distinct people, **When** none answers, **Then** exactly 3 dials were made and no fourth rung exists — the chain never extends past the owner. | T4 · §8 Rung | Settled |
 
 ### CFG — Configurability
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
-| AC-CFG-1 | **Given** `CSP-4412` is removed from the active cohort (C-03), **When** Meena calls, **Then** only Ravi is dialled and no escalation occurs. | C-03 | Settled |
-| AC-CFG-2 | **Given** the chain is switched off (C-04), **When** Meena calls, **Then** routing is identical to AC-REG-2's pre-spec behaviour for every in-scope ticket. | C-04 | Settled |
-| AC-CFG-3 | **Given** Pickup is removed from C-01, **When** Meena calls on a Pickup ticket, **Then** no chain is created, while her Service ticket still gets one. | C-01 | Settled |
+| AC-CFG-1 | **Given** the chain is switched off (C-04), **When** Meena calls, **Then** only Ravi is dialled, no escalation occurs, and routing is identical to AC-REG-2's pre-spec behaviour for every in-scope ticket. | C-04 | Settled |
+| AC-CFG-2 | **Given** the chain is switched off (C-04) and Ravi does not answer, **When** the dial completes unanswered, **Then** neither Anil nor Suresh is dialled and existing unconnected-call handling runs — the off switch removes the whole feature, not just its first rung. | C-04 | Settled |
 
 ### GRD — Guardrails
 
@@ -266,9 +270,9 @@ No design file is needed, because there is nothing to design.
 
 | Term | Meaning | Owner (domain) |
 |---|---|---|
-| Assigned executor | **Canonical definition:** the partner user assigned to carry out a ticket. Any role can be the executor — owner, Manager, Manager Plus or technician — so the executor's role is not fixed, and the executor may also be a later rung, in which case dedupe shortens the chain (R3). Always rung 1 (C-02, G2). | Partner Platform |
+| Assigned executor | **Canonical definition:** the partner user assigned to carry out a ticket. Any role can be the executor — owner, Manager, Manager Plus or technician — so the executor's role is not fixed, and the executor may also be a later rung, in which case dedupe shortens the chain (R3). Always rung 1 (G2). | Partner Platform |
 | Escalation chain | **Canonical definition:** the ordered list of distinct people dialled for one inbound customer call, and the act of moving down it when a person does not answer. Created per call, never carried between calls (R5). Carries: the ticket it belongs to, the ordered rungs after dedupe, the chain length, the answering rung index if any, and the end state (Connected / Exhausted / Abandoned). | — |
-| Rung | One position in an escalation chain, and the one person dialled at that position. Rung 1 is the assigned executor, rung 2 the manager-tier user, rung 3 the owner (C-02). | — |
+| Rung | **Canonical definition:** one position in an escalation chain, and the one person dialled at that position. There are exactly three, in this order: rung 1 the assigned executor, rung 2 the manager-tier user, rung 3 the owner. The order and the depth are system behaviour, not configuration — no chain ever extends past the owner (AC-BV-3). | — |
 | Manager-tier user | The CSP user holding the Manager or the Manager Plus role. A CSP cannot hold both at once by design, so this is always at most one person, and rung 2 is whichever of the two exists. | Partner Platform |
 | Ticket-level connect rate | **Canonical definition:** of tickets that had at least one call in the chosen direction and window, the share where at least one of those calls was answered by a person. A ticket counts once however many calls it had. Not to be confused with call-level connect rate, which is per call. Comparisons must never mix the two grains. | — |
 | Exhausted | A chain where every rung was dialled and none answered. Counts as not connected. | — |
@@ -276,7 +280,7 @@ No design file is needed, because there is nothing to design.
 | Install ticket | The new-connection installation ticket family. | — |
 | Service ticket | The restore ticket family — a live customer whose connection needs restoring. Called "Service" in the ops dashboard's ticket-type filter. | — |
 | Pickup ticket | The netbox-recovery (NBREC) ticket family — collecting equipment from a customer. | — |
-| Phase-1 cohort | The 99 CSPs on which IVR 2.0 is live, and this spec's launch scope (C-03). | — |
+| Phase-1 cohort | The CSPs on which IVR 2.0 is live — 99 of them when this spec's baselines were measured — and so this spec's launch scope. It is the IVR service's own rollout scope, not a parameter this spec sets (§5). | — |
 
 ---
 
@@ -293,7 +297,7 @@ What the platform must be able to do for this feature to exist. Whether these ar
 | Bridge to exactly one person per call, even when an answer and an advance coincide. | T2 · precedence 2 |
 | Fall back to dialling the assigned executor alone when the rung list cannot be resolved, without failing the call. | T8 |
 | Record, per call, the chain length after dedupe, the rung that answered if any, the end state, and the caller's wait before answer or hangup. | MQ-2 · MQ-3 · MQ-4 · MQ-5 · MQ-8 |
-| Turn the chain on or off, and vary its ticket families and CSP cohort, without a release. | C-01 · C-03 · C-04 |
+| Turn the chain off without a release, everywhere at once. | C-04 |
 
 ---
 
@@ -316,5 +320,6 @@ What the platform must be able to do for this feature to exist. Whether these ar
 |---|---|---|---|
 | §5 — every number that could change gets a C-id, including customer-experience latency targets even where engineering owns them | Per-rung ring duration and the total ringing the customer hears are **not** C-ids and appear nowhere in §5 | Ring behaviour is Exotel App Bazaar applet configuration, not a parameter of this service. Consistent with the June 2026 decision to drop `ES_CSPIVR_CALL_BRIDGE_MAX_RING_SECONDS` from the IVR spec for the same reason. Customer wait is still measured via MQ-8. | Ashish Raj (PM), 3 Aug 2026 |
 | Header — name consulted parties by domain | No consulted parties are named; the header carries Owner, Reviewer, Status, Sign-off and Version only | PM removed all three consulted slots. The spec changes no other team's surface: it reads existing partner-role data and dials through the existing telephony integration. | Ashish Raj (PM), 3 Aug 2026 |
+| §5 — every number that could change gets a C-id; every number outside §5 is a C-id | §5 holds one parameter, C-04. Ticket families, the CSP cohort and the rung order were C-ids and are now plain facts stated in §1, §3b and §8 — including the count of CSPs in §8's Phase-1 cohort entry | None of the three is this spec's to set. Cohort and families follow the IVR service's own rollout, so a second control here would only let the two disagree. Rung order is system behaviour, and it was already "Fixed in V1" — a parameter nobody can change is not a parameter. C-04 remains as a straight off switch. | Ashish Raj (PM), 4 Aug 2026 |
 | §4 — one block per screen the feature touches, internal screens included, each with states, freshness, an elements table and a design link | §4 carries no screen block at all — only a statement that the feature has no screen | The feature is invisible by design (G1), so no app screen changes. An internal ops view was drafted and removed at the PM's instruction: §6 already states what the system must answer, and where those answers are read is the implementer's. | Ashish Raj (PM), 4 Aug 2026 |
 | §1 — "what does the customer see between two windows" | No in-between state specified | This spec owns no clocks, so no gap between windows exists. | Ashish Raj (PM), 3 Aug 2026 |
