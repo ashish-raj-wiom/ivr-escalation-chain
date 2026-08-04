@@ -2,8 +2,8 @@
 
 | | | | |
 |---|---|---|---|
-| **Owner** — Ashish Raj (PM) | **Reviewer** — Rahul (Eng Lead) | **Status** — Draft | **Sign-off** — Pending |
-| **Version** — v0.5 · 4 Aug 2026 | | | |
+| **Owner** — Ashish Raj (PM) | **Reviewer** — Rahul (Eng Lead) | **Status** — Signed off | **Sign-off** — Signed off · 4 Aug 2026 |
+| **Version** — v1.1 · 4 Aug 2026 | | | |
 
 ---
 
@@ -36,7 +36,7 @@ Ticket-level connect rate is defined in §8. A ticket where the customer hung up
 |---|---|---|---|---|
 | M1 | Ticket-level connect rate — **Service** (restore) | 50.2% | 69.0% | MQ-1 |
 | M2 | Ticket-level connect rate — **Pickup** | 51.1% | 69.0% | MQ-1 |
-| M3 | Ticket-level connect rate — **Install** | 69.0% | ≥ 69.0% — any gain is upside; a fall below baseline is a regression ⚠️ *AI GENERATED — review* | MQ-1 |
+| M3 | Ticket-level connect rate — **Install** | 69.0% | ≥ 69.0% — any gain is upside; a fall below baseline is a regression | MQ-1 |
 | M4 | Share of in-scope tickets that connect at **rung 1** — the assigned executor | 50.2% Service · 51.1% Pickup · 69.0% Install — today every connect is the executor, because there is no second rung | No family falls below its own baseline | MQ-3 |
 
 **Where the 69.0% comes from, and why it does not move.** 69.0% is what install tickets achieved on customer-initiated calls in the window above — **before** this spec ships. It is the closest thing to a ceiling this direction is known to reach, so Service and Pickup aim at it. It is frozen as a historical mark: install is itself in scope (§1 Boundary), so install's own rate should climb past 69.0% and must not be allowed to redefine M1 and M2's target as it does. The benchmark is also direction-matched on purpose — install's all-directions figure (79.6%) mixes in CSP-initiated calls, and its CSP-initiated figure (75.8%) belongs to the customer-side PRD, so neither can be used here.
@@ -100,7 +100,7 @@ flowchart TD
 
 **Precedence — first answer wins.** If a rung answers at the same instant the chain advances, the call bridges to the rung that answered and the other dial is dropped; the customer is never bridged to two people (T2, AC-RACE-2).
 
-**Precedence — a ticket closing mid-chain does not stop it.** A chain already ringing when its ticket closes runs to completion; ticket closure is evaluated at caller resolution, not per rung (AC-RACE-3). ⚠️ *AI GENERATED — review*
+**Precedence — a ticket closing mid-chain does not stop it.** A chain already ringing when its ticket closes runs to completion; ticket closure is evaluated at caller resolution, not per rung (AC-RACE-3).
 
 ### 3b. State transition table — canon
 
@@ -115,7 +115,7 @@ Lifecycle of an **escalation chain** (created when a customer-initiated call is 
 | T5 | Ringing rung N | Customer disconnects | — | Abandoned | Chain ends immediately; no further rung is dialled. Ticket counted as not connected (M1, M2, M3, MQ-5). Terminal state. |
 | T6 | — | Customer-initiated call bridged, caller resolved to an in-scope ticket | No executor assigned to the ticket | Outside this spec | Today's routing runs unchanged; no chain is created (§1 Boundary, AC-REG-2). |
 | T7 | — | Customer-initiated call bridged, caller resolved to an in-scope ticket | Executor, manager-tier user and owner resolve to one person after dedupe (R3) | Ringing rung 1 | That person dialled once (G3). No answer routes to T4, not T3. |
-| T8 | — | Customer-initiated call bridged, caller resolved to an in-scope ticket | Role list cannot be resolved | Ringing rung 1 | **Failure envelope:** the call is never failed for want of a role list — it degrades to dialling the assigned executor alone, which is today's behaviour. No answer routes to T4. How resolution is retried inside the call is the implementer's. ⚠️ *AI GENERATED — review* |
+| T8 | — | Customer-initiated call bridged, caller resolved to an in-scope ticket | Role list cannot be resolved | Ringing rung 1 | **Failure envelope:** the call is never failed for want of a role list — it degrades to dialling the assigned executor alone, which is today's behaviour. No answer routes to T4. How resolution is retried inside the call is the implementer's. |
 
 ---
 
@@ -133,7 +133,7 @@ No design file is needed, because there is nothing to design.
 
 | ID | Parameter | Default | Range | Who changes it |
 |---|---|---|---|---|
-| C-04 | Chain enabled — kill switch (T1) | On, wherever IVR 2.0 is live | On / Off | Product + Eng ⚠️ *AI GENERATED — review* |
+| C-04 | Chain enabled — kill switch (T1) | On, wherever IVR 2.0 is live | On / Off | Product + Eng |
 
 **This spec owns one parameter, and only one.** Everything else about the chain's reach is inherited, not tuned here:
 
@@ -158,13 +158,15 @@ So C-04 is a straight off switch for the whole feature, and nothing narrower.
 | MQ-5 | How many chains ended Connected, Exhausted or Abandoned. | M1, M2, M3 definition · T4 · T5 |
 | MQ-6 | Whether any person dialled in a chain did not belong to the ticket's CSP. | G4 invariant (R6) |
 | MQ-7 | Whether any chain dialled a rung other than the assigned executor first, where an executor was assigned and had a number. | G2 invariant (R2) |
-| MQ-8 | The time from bridge to answer or to customer disconnect, by the rung reached. ⚠️ *AI GENERATED — review* | Abandonment risk behind M1, M2, M3 · R7 |
+| MQ-8 | The time from bridge to answer or to customer disconnect, by the rung reached. | Abandonment risk behind M1, M2, M3 · R7 |
+| MQ-9 | For connected calls, the spread of how long the customer and the answering person actually talked, by the rung that answered. | The honesty of M1, M2, M3 · M4 · G2 |
+| MQ-10 | For one inbound call, the outcome of **every** rung dialled, one row each — which person was dialled, at which rung position, and whether they answered, did not answer, were busy or could not be reached — with every row tied to that call's chain by a single identifier, and to the ticket. | M4 · G2 · G3 · G4 · underpins MQ-2 · MQ-3 · MQ-4 |
 
 ---
 
 ## 7. Acceptance Criteria
 
-**Example data used throughout** ⚠️ *AI GENERATED — review* — CSP `CSP-4412`: technician Ravi (09811100011), Manager Anil (09811100012), Owner Suresh (09811100013). Service ticket `TKT-88231` for customer Meena (09811100022), with Ravi as its assigned executor. Calls on 12 Aug 2026.
+**Example data used throughout** — CSP `CSP-4412`: technician Ravi (09811100011), Manager Anil (09811100012), Owner Suresh (09811100013). Service ticket `TKT-88231` for customer Meena (09811100022), with Ravi as its assigned executor. Calls on 12 Aug 2026.
 
 ### CHN — Chain creation and rung 1 (T1, T7, T8)
 
@@ -206,6 +208,9 @@ So C-04 is a straight off switch for the whole feature, and nothing narrower.
 | AC-WF-1 | **Given** `TKT-88231` with Ravi as executor, Anil and Suresh, **When** Meena calls at 15:20, Ravi does not answer and Anil does, **Then** Meena has spoken to Anil on one call, was never asked to redial or press a key, and `TKT-88231` counts as connected at rung 2. | R1 · T1 · T3 · T2 · G1 | Settled |
 | AC-WF-2 | **Given** the same setup, **When** none of Ravi, Anil or Suresh answers, **Then** exactly three numbers were dialled in that order, the chain ends Exhausted, and `TKT-88231` counts as not connected. | T1 · T3 · T4 · M1 | Settled |
 | AC-WF-3 | **Given** Meena's call at 15:20 ended Exhausted, **When** she calls again at 15:45, **Then** a new chain starts at Ravi — not at Anil or Suresh. | R5 · T1 | Settled |
+| AC-WF-4 | **Given** the 3-rung chain on `TKT-88231`, **When** Meena calls at 15:20, Ravi does not answer and Anil does, **Then** that call's record holds **two** rung rows — Ravi at rung 1, not answered; Anil at rung 2, answered — both carrying the same chain identifier and the same ticket, and Suresh has no row at all. | MQ-10 · T3 · T2 | Settled |
+| AC-WF-5 | **Given** the same chain, **When** none of Ravi, Anil or Suresh answers, **Then** the record holds **three** rung rows in dial order, each naming its person, position and outcome, all under one chain identifier — so the call shows three separate misses, not one. | MQ-10 · T3 · T4 | Settled |
+| AC-WF-6 | **Given** Meena's 15:20 call reached Anil and her 15:45 call reached Ravi, **When** both calls are examined, **Then** each has its own chain identifier and its rung rows belong to exactly one of them — the two calls' rungs are never mixed. | MQ-10 · R5 · T1 | Settled |
 
 ### FAIL — Failure envelopes (T8)
 
@@ -271,10 +276,10 @@ So C-04 is a straight off switch for the whole feature, and nothing narrower.
 | Term | Meaning | Owner (domain) |
 |---|---|---|
 | Assigned executor | **Canonical definition:** the partner user assigned to carry out a ticket. Any role can be the executor — owner, Manager, Manager Plus or technician — so the executor's role is not fixed, and the executor may also be a later rung, in which case dedupe shortens the chain (R3). Always rung 1 (G2). | Partner Platform |
-| Escalation chain | **Canonical definition:** the ordered list of distinct people dialled for one inbound customer call, and the act of moving down it when a person does not answer. Created per call, never carried between calls (R5). Carries: the ticket it belongs to, the ordered rungs after dedupe, the chain length, the answering rung index if any, and the end state (Connected / Exhausted / Abandoned). | — |
+| Escalation chain | **Canonical definition:** the ordered list of distinct people dialled for one inbound customer call, and the act of moving down it when a person does not answer. Created per call, never carried between calls (R5). Carries: **its own identifier**, the ticket it belongs to, the ordered rungs after dedupe, the chain length, the answering rung index if any, and the end state (Connected / Exhausted / Abandoned). Each rung dialled carries its own outcome — who was dialled, at which position, and what happened — and every one of those rows is joined to the chain by that identifier, so a call where the executor missed and the manager answered shows both people separately rather than one summary (MQ-10). | — |
 | Rung | **Canonical definition:** one position in an escalation chain, and the one person dialled at that position. There are exactly three, in this order: rung 1 the assigned executor, rung 2 the manager-tier user, rung 3 the owner. The order and the depth are system behaviour, not configuration — no chain ever extends past the owner (AC-BV-3). | — |
 | Manager-tier user | The CSP user holding the Manager or the Manager Plus role. A CSP cannot hold both at once by design, so this is always at most one person, and rung 2 is whichever of the two exists. | Partner Platform |
-| Ticket-level connect rate | **Canonical definition:** of tickets that had at least one call in the chosen direction and window, the share where at least one of those calls was answered by a person. A ticket counts once however many calls it had. Not to be confused with call-level connect rate, which is per call. Comparisons must never mix the two grains. | — |
+| Ticket-level connect rate | **Canonical definition:** of tickets that had at least one call in the chosen direction and window, the share where at least one of those calls was answered by a person. A ticket counts once however many calls it had. **Any answered call counts, however short** — this matches how the rate is measured today, so baselines and targets compare like with like. A very short call still counts, so MQ-9 reports how long people actually talked: if answered calls get shorter as the chain rolls out, the rate is rising on calls that helped nobody. Not to be confused with call-level connect rate, which is per call. Comparisons must never mix the two grains. | — |
 | Exhausted | A chain where every rung was dialled and none answered. Counts as not connected. | — |
 | Abandoned | A chain where the customer disconnected before any rung answered. Counts as not connected. | — |
 | Install ticket | The new-connection installation ticket family. | — |
@@ -296,21 +301,9 @@ What the platform must be able to do for this feature to exist. Whether these ar
 | End a chain the moment the caller disconnects, dialling nothing further. | T5 · precedence 1 |
 | Bridge to exactly one person per call, even when an answer and an advance coincide. | T2 · precedence 2 |
 | Fall back to dialling the assigned executor alone when the rung list cannot be resolved, without failing the call. | T8 |
-| Record, per call, the chain length after dedupe, the rung that answered if any, the end state, and the caller's wait before answer or hangup. | MQ-2 · MQ-3 · MQ-4 · MQ-5 · MQ-8 |
+| Give each chain an identifier, and record one row per rung dialled against it — the person, the rung position and that rung's outcome — so every person dialled on a call is separately visible and attributable, not just the one who answered. | MQ-10 · G2 · G3 · G4 |
+| Record, per call, the chain length after dedupe, the rung that answered if any, the end state, and the caller's wait before answer or hangup. | MQ-2 · MQ-3 · MQ-4 · MQ-5 · MQ-8 · MQ-9 |
 | Turn the chain off without a release, everywhere at once. | C-04 |
-
----
-
-## AI-generated content for review
-
-| Location | What was generated | Basis |
-|---|---|---|
-| §1 M3 target | "≥ 69.0% — any gain is upside; a fall below baseline is a regression" | PM said install is in scope because any extra gain is welcome, which implies no committed target. The no-regression floor is inferred, not stated. |
-| §3a precedence 3 | A ticket closing mid-chain does not stop the chain | Default. Not discussed; the alternative (yanking a ringing call) seemed clearly worse. |
-| §3b T8 | Failure envelope — degrade to executor-only when the rung list cannot be resolved | Default. PM did not state behaviour when the role lookup fails. |
-| §5 C-04 | Kill switch, and Eng as joint owner | Default. No rollback control was discussed; a cohort-wide behaviour change normally needs one. |
-| §6 MQ-8 | Customer wait before answer or hangup | Inferred. Ring durations are out of scope, but the abandonment risk they create still needs measuring. |
-| §7 | The whole example dataset — `CSP-4412`, Ravi, Anil, Suresh, Meena, `TKT-88231`, the numbers and the 12 Aug 2026 date | Invented. ACs need concrete data to be executable. Replace with a real CSP and ticket if you want these runnable as-is. |
 
 ---
 
