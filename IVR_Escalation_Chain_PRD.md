@@ -3,7 +3,7 @@
 | | | | |
 |---|---|---|---|
 | **Owner** — Ashish Raj (PM) | **Reviewer** — Rahul (Eng Lead) | **Status** — Signed off | **Sign-off** — Signed off · 4 Aug 2026 |
-| **Version** — v1.2 · 4 Aug 2026 | | | |
+| **Version** — v1.3 · 4 Aug 2026 | | | |
 
 ---
 
@@ -15,7 +15,7 @@
 
 - **CSP-initiated calls** to customers — a separate PRD covers reaching the customer on a second number (AC-REG-1).
 - **Calls on a ticket with no executor assigned** — today's behaviour stands, untouched (T6, AC-REG-2).
-- **Bridge-rate behaviour** — caller identification, PIN entry and dead-end handling are governed by the existing IVR product spec and its Phase-1 RCA (AC-REG-3).
+- **Bridge-rate behaviour** — caller identification, PIN entry and dead-end handling are governed by the existing IVR product spec and its Phase-1 RCA (AC-REG-3). **Including which of a customer's numbers identify them:** a customer may call from their registered number or from an alternate number held for them, and the alternate-number PRD makes both resolve to the same customer. Once a call is identified and its PIN has named a ticket, this spec runs the chain identically — it never asks which number the customer called from (AC-REG-6).
 - **What the answering person is told about the call** — no ticket context, customer name or escalation indicator is delivered to any rung. Out of scope (AC-REG-4).
 - **Ring durations** — how long each rung rings, and the total ringing a customer hears, are Exotel applet configuration, not parameters of this spec (see Overrides).
 - **Call-status recording** — every call status Exotel returns is still recorded for each individual call, exactly as today. This spec adds to that record, it does not replace or reshape it: MQ-10 asks that the rungs of one chain also be attributable to each other and to the ticket (AC-REG-5).
@@ -228,6 +228,7 @@ So C-04 is a straight off switch for the whole feature, and nothing narrower.
 | AC-REG-3 | **Given** Meena calls the masked number and enters a wrong PIN, **When** the call reaches the dead end, **Then** the existing caller-identification and dead-end behaviour is unchanged — this spec begins only after a caller resolves to a ticket. | §1 Boundary | Settled |
 | AC-REG-4 | **Given** Anil answers as rung 2 on `TKT-88231`, **When** the call bridges, **Then** Anil receives no ticket reference, customer name or escalation indicator — unchanged from today. | §1 Boundary | Settled |
 | AC-REG-5 | **Given** Meena's call where Ravi did not answer and Anil did, **When** the call statuses Exotel returned are examined, **Then** each dial has its own status record in the same shape and detail as before this spec — the chain's own per-rung record (MQ-10) sits alongside it and replaces nothing. | MQ-10 · §1 Boundary | Settled |
+| AC-REG-6 | **Given** Meena calls from an alternate number held for her rather than her registered number, **When** she is identified and her PIN names `TKT-88231`, **Then** the chain runs exactly as in AC-WF-1 — Ravi, then Anil, then Suresh — and nothing about it differs because of which number she called from. | §1 Boundary · T1 · G2 | Settled |
 
 ### RACE — Simultaneity (§3a precedence rules)
 
