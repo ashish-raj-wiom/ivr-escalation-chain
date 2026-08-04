@@ -152,11 +152,11 @@
   <h1>IVR Escalation Chain — customer-initiated call routing</h1>
 </header>
 
-<table class="delta"><tbody><tr><td><strong>Owner</strong> — Ashish Raj (PM)</td><td><strong>Reviewer</strong> — Rahul (Eng Lead)</td><td><strong>Status</strong> — Draft</td><td><strong>Sign-off</strong> — Pending</td></tr><tr><td><strong>Version</strong> — v0.2 · 3 Aug 2026</td><td></td><td></td><td></td></tr></tbody></table>
+<table class="delta"><tbody><tr><td><strong>Owner</strong> — Ashish Raj (PM)</td><td><strong>Reviewer</strong> — Rahul (Eng Lead)</td><td><strong>Status</strong> — Draft</td><td><strong>Sign-off</strong> — Pending</td></tr><tr><td><strong>Version</strong> — v0.3 · 4 Aug 2026</td><td></td><td></td><td></td></tr></tbody></table>
 <hr class="sect-end">
 <section class="spec" id="1-objective-definition-of-success">
 <h2><span class="num">1.</span> Objective &amp; Definition of Success</h2>
-<p><strong>Objective.</strong> A customer who calls about their installation, restore or pickup ticket reaches a person at their own CSP — if the assigned executor does not answer, the call moves on by itself to that CSP's manager and then its owner, and the customer does nothing but wait.</p>
+<p><strong>Objective.</strong> A customer who calls about their installation, restore or pickup ticket reaches a person at their own CSP — if the assigned executor does not answer, the call moves on by itself to that CSP's manager and then its owner, and the customer's chances of getting connected to a CSP user increase.</p>
 <p><strong>Boundary.</strong> This spec governs <strong>customer-initiated</strong> IVR calls on Install, Service (restore) and Pickup tickets for CSPs in the Phase-1 cohort (C-01, C-03). It leaves unchanged:</p>
 <ul><li><strong>CSP-initiated calls</strong> to customers — a separate PRD covers reaching the customer on a second number (AC-REG-1).</li><li><strong>Calls on a ticket with no executor assigned</strong> — today's behaviour stands, untouched (T6, AC-REG-2).</li><li><strong>Bridge-rate behaviour</strong> — caller identification, PIN entry and dead-end handling are governed by the existing IVR product spec and its Phase-1 RCA (AC-REG-3).</li><li><strong>What the answering person is told about the call</strong> — no ticket context, customer name or escalation indicator is delivered to any rung. Out of scope (AC-REG-4).</li><li><strong>Ring durations</strong> — how long each rung rings, and the total ringing a customer hears, are Exotel applet configuration, not parameters of this spec (see Overrides).</li></ul>
 <h3 id="guardrails-promises-that-hold-on-every-path">Guardrails — promises that hold on every path</h3>

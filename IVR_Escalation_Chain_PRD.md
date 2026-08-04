@@ -3,13 +3,13 @@
 | | | | |
 |---|---|---|---|
 | **Owner** — Ashish Raj (PM) | **Reviewer** — Rahul (Eng Lead) | **Status** — Draft | **Sign-off** — Pending |
-| **Version** — v0.2 · 3 Aug 2026 | | | |
+| **Version** — v0.3 · 4 Aug 2026 | | | |
 
 ---
 
 ## 1. Objective & Definition of Success
 
-**Objective.** A customer who calls about their installation, restore or pickup ticket reaches a person at their own CSP — if the assigned executor does not answer, the call moves on by itself to that CSP's manager and then its owner, and the customer does nothing but wait.
+**Objective.** A customer who calls about their installation, restore or pickup ticket reaches a person at their own CSP — if the assigned executor does not answer, the call moves on by itself to that CSP's manager and then its owner, and the customer's chances of getting connected to a CSP user increase.
 
 **Boundary.** This spec governs **customer-initiated** IVR calls on Install, Service (restore) and Pickup tickets for CSPs in the Phase-1 cohort (C-01, C-03). It leaves unchanged:
 
