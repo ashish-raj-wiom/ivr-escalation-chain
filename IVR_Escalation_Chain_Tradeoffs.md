@@ -27,6 +27,9 @@ Owner: Ashish Raj · Signed off 4 Aug 2026
 | 19 | The executor is reassigned while a chain is mid-flight | Leave unrepresented in §3b | Add a transition for re-resolving rungs mid-chain | A chain lives only seconds; the window is too narrow to specify behaviour for | 4 Aug 2026 |
 | 20 | How much of the chain must be traceable after the call? | One row per rung dialled — person, position, outcome — all joined by a chain identifier (MQ-10) | Record only which rung answered, as the spec did at v1.0 | PM caught the gap at sign-off: if U1 misses and U2 answers, both must be visible separately and linked by an identifier. The answering rung alone cannot show who was tried and failed, which is what G2, G3 and G4 all depend on | 4 Aug 2026 |
 
+| 21 | Can a rung be skipped because that person has no phone number on file? | No — a rung is vacant only when the **role has no user**. The no-number branch is removed everywhere | Keep "no user or no number" as the skip condition, with an AC for a numberless executor | Every partner user has a mobile number, so a numberless rung cannot occur. AC-CHN-5 tested an impossible case and was deleted | 4 Aug 2026 |
+| 22 | Does the chain change how Exotel call statuses are recorded? | No — every status is still recorded per individual call, exactly as today. MQ-10's per-rung chain record sits alongside it | Let MQ-10's requirement reshape or replace the existing per-call logging | Existing call-status recording must continue untouched; the chain record adds attribution, it does not restructure what is already captured. Stated in §1 Boundary, tested by AC-REG-5 | 4 Aug 2026 |
+
 ## Rejected framings worth remembering
 
 Two things were considered and dropped for reasons that are not decisions about the product, but are worth not repeating:

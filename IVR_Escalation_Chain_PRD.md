@@ -3,7 +3,7 @@
 | | | | |
 |---|---|---|---|
 | **Owner** — Ashish Raj (PM) | **Reviewer** — Rahul (Eng Lead) | **Status** — Signed off | **Sign-off** — Signed off · 4 Aug 2026 |
-| **Version** — v1.1 · 4 Aug 2026 | | | |
+| **Version** — v1.2 · 4 Aug 2026 | | | |
 
 ---
 
@@ -18,6 +18,7 @@
 - **Bridge-rate behaviour** — caller identification, PIN entry and dead-end handling are governed by the existing IVR product spec and its Phase-1 RCA (AC-REG-3).
 - **What the answering person is told about the call** — no ticket context, customer name or escalation indicator is delivered to any rung. Out of scope (AC-REG-4).
 - **Ring durations** — how long each rung rings, and the total ringing a customer hears, are Exotel applet configuration, not parameters of this spec (see Overrides).
+- **Call-status recording** — every call status Exotel returns is still recorded for each individual call, exactly as today. This spec adds to that record, it does not replace or reshape it: MQ-10 asks that the rungs of one chain also be attributable to each other and to the ticket (AC-REG-5).
 
 ### Guardrails — promises that hold on every path
 
@@ -58,9 +59,9 @@ Install has the least room to gain of the three families, and that is expected. 
 | ID | Story | MUST | MUST NOT |
 |---|---|---|---|
 | R1 | As a customer whose internet is down, when I call about my ticket I want to reach *someone* at my provider, not hear ringing and give up. | **(a)** Advance to the next rung by itself when the current rung does not answer. **(b)** Bridge the call to the first rung that answers. | **(a)** Ask the customer to press a key, hold, redial or call another number. **(b)** Tell the customer that escalation is happening or which rung is ringing. |
-| R2 | As a CSP owner, I want the person actually assigned to the job to get the call first, so escalation stays the exception. | Dial the assigned executor as rung 1 on every chain, whatever role that person holds (G2). | Skip, reorder or bypass the executor when one is assigned and has a number. |
+| R2 | As a CSP owner, I want the person actually assigned to the job to get the call first, so escalation stays the exception. | Dial the assigned executor as rung 1 on every chain, whatever role that person holds (G2). | Skip, reorder or bypass the executor when one is assigned. |
 | R3 | As a CSP owner who is also the executor on my own jobs, I do not want my phone rung three times for one call. | Dial each distinct person once; where two or three rungs resolve to the same person, shorten the chain (G3). | Dial the same person more than once in one chain. |
-| R4 | As a customer at a CSP that has no manager, I still want the chain to reach the owner. | Skip a rung that has no user or no number, and continue to the next rung that exists. | Fail, end or shorten the call because a rung is vacant. |
+| R4 | As a customer at a CSP that has no manager, I still want the chain to reach the owner. | Skip a rung that has no user, and continue to the next rung that exists. | Fail, end or shorten the call because a rung is vacant. |
 | R5 | As an executor who missed a call, I want the next call on that ticket to reach me first. | Treat every inbound call as a new chain that starts at the executor. | Resume a later call part-way down the chain, or remember which rungs already failed. |
 | R6 | As a customer, I want my ticket discussed only with people at my own provider. | Restrict every rung to users of the CSP that owns the ticket (G4). | Dial another CSP's users, a Wiom call centre, or any number not held against this CSP. |
 | R7 | As a customer whose line dies at night, I want the chain to work then too. | Run the full chain at every hour of the day, every day. | Suppress, shorten or delay the chain outside working hours. |
@@ -108,7 +109,7 @@ Lifecycle of an **escalation chain** (created when a customer-initiated call is 
 
 | ID | From | Action / Trigger | Rule / Check | To | Side-effects |
 |---|---|---|---|---|---|
-| T1 | — | Customer-initiated call bridged, caller resolved to an in-scope ticket | Chain enabled (C-04); executor assigned with a number; role list resolves to 2 or 3 distinct people after dedupe (R3) and after skipping vacant rungs (R4) | Ringing rung 1 | Assigned executor dialled (R2, G2). Chain length after dedupe recorded (MQ-4). |
+| T1 | — | Customer-initiated call bridged, caller resolved to an in-scope ticket | Chain enabled (C-04); executor assigned; role list resolves to 2 or 3 distinct people after dedupe (R3) and after skipping vacant rungs (R4) | Ringing rung 1 | Assigned executor dialled (R2, G2). Chain length after dedupe recorded (MQ-4). |
 | T2 | Ringing rung N | The ringing rung answers | — | Connected | Call bridged to that person (R1b). Answering rung index recorded (MQ-2, MQ-3). Terminal state. |
 | T3 | Ringing rung N | The ringing rung does not answer, is busy, or the dial fails | A further distinct rung exists | Ringing rung N+1 | Next distinct person dialled (R3), and not before the current rung's dial has finished unanswered. No customer action and no announcement (R1a, R1 must-not(b), G1). |
 | T4 | Ringing rung N | The ringing rung does not answer, is busy, or the dial fails | No further rung exists | Exhausted | Existing unconnected-call handling applies, unchanged (§1 Boundary). Ticket counted as not connected (M1, M2, M3, MQ-5). Terminal state. |
@@ -157,7 +158,7 @@ So C-04 is a straight off switch for the whole feature, and nothing narrower.
 | MQ-4 | How many chains were shortened by dedupe, and to what length. | G3 · R3 |
 | MQ-5 | How many chains ended Connected, Exhausted or Abandoned. | M1, M2, M3 definition · T4 · T5 |
 | MQ-6 | Whether any person dialled in a chain did not belong to the ticket's CSP. | G4 invariant (R6) |
-| MQ-7 | Whether any chain dialled a rung other than the assigned executor first, where an executor was assigned and had a number. | G2 invariant (R2) |
+| MQ-7 | Whether any chain dialled a rung other than the assigned executor first, where an executor was assigned. | G2 invariant (R2) |
 | MQ-8 | The time from bridge to answer or to customer disconnect, by the rung reached. | Abandonment risk behind M1, M2, M3 · R7 |
 | MQ-9 | For connected calls, the spread of how long the customer and the answering person actually talked, by the rung that answered. | The honesty of M1, M2, M3 · M4 · G2 |
 | MQ-10 | For one inbound call, the outcome of **every** rung dialled, one row each — which person was dialled, at which rung position, and whether they answered, did not answer, were busy or could not be reached — with every row tied to that call's chain by a single identifier, and to the ticket. | M4 · G2 · G3 · G4 · underpins MQ-2 · MQ-3 · MQ-4 |
@@ -176,10 +177,9 @@ So C-04 is a straight off switch for the whole feature, and nothing narrower.
 | AC-CHN-2 | **Given** `TKT-88231` where Suresh is both the owner and its assigned executor, and Anil is the manager, **When** Meena calls, **Then** the chain has 2 rungs — Suresh then Anil — and 09811100013 is dialled exactly once. | R3 · T1 · G3 | Settled |
 | AC-CHN-3 | **Given** `CSP-4412` with no manager-tier user and no Manager Plus, **When** Meena calls, **Then** the chain has 2 rungs — Ravi then Suresh — and no dial is attempted against a vacant rung. | R4 · T1 | Settled |
 | AC-CHN-4 | **Given** a CSP where the executor, manager and owner are all Suresh, **When** Meena calls, **Then** the chain has exactly 1 rung, 09811100013 is dialled once, and on no answer the chain ends Exhausted rather than advancing. | R3 · T7 · G3 | Settled |
-| AC-CHN-5 | **Given** Ravi is the executor on `TKT-88231` but has no phone number on `CSP-4412`, **When** Meena calls, **Then** rung 1 is skipped without a dial and Anil's 09811100012 is dialled first. | R4 · T1 | Settled |
-| AC-CHN-6 | **Given** a Pickup ticket for Meena at `CSP-4412`, **When** she calls, **Then** the chain is created — Pickup is in scope. | T1 · §1 Boundary | Settled |
-| AC-CHN-7 | **Given** `TKT-88231` where Anil the manager is its assigned executor, **When** Meena calls, **Then** the chain has 2 rungs — Anil then Suresh — and Anil's 09811100012 is dialled first, not Ravi's. | R2 · R3 · T1 · G2 | Settled |
-| AC-CHN-8 | **Given** an install ticket for Meena at `CSP-4412` with Ravi as executor, **When** she calls, **Then** the chain is created — install is in scope. | T1 · §1 Boundary | Settled |
+| AC-CHN-5 | **Given** a Pickup ticket for Meena at `CSP-4412`, **When** she calls, **Then** the chain is created — Pickup is in scope. | T1 · §1 Boundary | Settled |
+| AC-CHN-6 | **Given** `TKT-88231` where Anil the manager is its assigned executor, **When** Meena calls, **Then** the chain has 2 rungs — Anil then Suresh — and Anil's 09811100012 is dialled first, not Ravi's. | R2 · R3 · T1 · G2 | Settled |
+| AC-CHN-7 | **Given** an install ticket for Meena at `CSP-4412` with Ravi as executor, **When** she calls, **Then** the chain is created — install is in scope. | T1 · §1 Boundary | Settled |
 
 ### ESC — Escalation and connection (T2, T3)
 
@@ -227,6 +227,7 @@ So C-04 is a straight off switch for the whole feature, and nothing narrower.
 | AC-REG-2 | **Given** a Service ticket at `CSP-4412` with no executor assigned, **When** Meena calls, **Then** routing is exactly as before this spec and no chain is created. | T6 · §1 Boundary | Settled |
 | AC-REG-3 | **Given** Meena calls the masked number and enters a wrong PIN, **When** the call reaches the dead end, **Then** the existing caller-identification and dead-end behaviour is unchanged — this spec begins only after a caller resolves to a ticket. | §1 Boundary | Settled |
 | AC-REG-4 | **Given** Anil answers as rung 2 on `TKT-88231`, **When** the call bridges, **Then** Anil receives no ticket reference, customer name or escalation indicator — unchanged from today. | §1 Boundary | Settled |
+| AC-REG-5 | **Given** Meena's call where Ravi did not answer and Anil did, **When** the call statuses Exotel returned are examined, **Then** each dial has its own status record in the same shape and detail as before this spec — the chain's own per-rung record (MQ-10) sits alongside it and replaces nothing. | MQ-10 · §1 Boundary | Settled |
 
 ### RACE — Simultaneity (§3a precedence rules)
 
@@ -264,7 +265,7 @@ So C-04 is a straight off switch for the whole feature, and nothing narrower.
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
 | AC-GRD-1 | **Given** any chain that reaches rung 2 or rung 3, **When** the call is reviewed end to end, **Then** the customer heard no announcement, pressed no key, and the call was never disconnected and re-established. | G1 · R1 | Settled |
-| AC-GRD-2 | **Given** 1,000 chains across the cohort, **When** the first dial of each is checked, **Then** every one dialled the assigned executor where an executor was assigned and had a number — whatever role that executor held. | G2 · R2 · MQ-7 | Settled |
+| AC-GRD-2 | **Given** 1,000 chains across the cohort, **When** the first dial of each is checked, **Then** every one dialled the assigned executor wherever one was assigned — whatever role that executor held. | G2 · R2 · MQ-7 | Settled |
 | AC-GRD-3 | **Given** any chain at a CSP where one person is both the executor and a later rung, **When** the dial list is checked, **Then** no person appears twice. | G3 · R3 · MQ-4 | Settled |
 | AC-GRD-4 | **Given** any chain on `TKT-88231`, **When** every number dialled is checked against `CSP-4412`'s user list, **Then** all of them belong to `CSP-4412` and none is a Wiom or other-CSP number. | G4 · R6 · MQ-6 | Settled |
 | AC-GRD-5 | **Given** a Service ticket where Meena calls at 23:40, **When** Ravi does not answer, **Then** the chain advances to Anil and then Suresh exactly as it would at 15:20. | R7 | Settled |
