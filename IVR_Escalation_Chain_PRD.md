@@ -3,7 +3,7 @@
 | | | | |
 |---|---|---|---|
 | **Owner** — Ashish Raj (PM) | **Reviewer** — Rahul (Eng Lead) | **Status** — Draft | **Sign-off** — Pending |
-| **Version** — v0.3 · 4 Aug 2026 | | | |
+| **Version** — v0.4 · 4 Aug 2026 | | | |
 
 ---
 
@@ -121,28 +121,11 @@ Lifecycle of an **escalation chain** (created when a customer-initiated call is 
 
 ## 4. Screen Requirements
 
-**Experience intent:** the customer notices nothing. The one truth this feature reinforces is *someone will pick up* — never *you are being escalated*.
+**Not applicable — this feature has no screen.** The whole call happens on the phone network, and G1 requires the escalation be invisible: R1's must-not bars any announcement, indicator or customer action. The Customer App, CSP App and Technician App are all untouched (AC-GRD-1). Ticket context for the answering rung is out of scope (§1 Boundary, AC-REG-4).
 
-**No customer-facing or partner-facing screen changes.** G1 requires the chain be invisible, and R1's must-not bars any announcement or indicator. The Customer App, CSP App and Technician App are untouched by this spec. Ticket context for the answering rung is out of scope (§1 Boundary).
+No design file is needed, because there is nothing to design.
 
-**Master design file:** none — no visual design is required. Named gap, not an omission.
-
-### IVR ops dashboard — Phase-1 view ⚠️ *AI GENERATED — review*
-
-Internal screen. It must show the chain's outcomes, so §6's questions have an answer and M4 stays visible.
-
-**States:** populated (calls exist in the selected window) · empty (no calls in window)
-**Freshness:** on open, and on filter change
-
-| Element | Source / Routes to | Logic |
-|---|---|---|
-| Field — ticket-level connect rate | computed (MQ-1) | split by ticket family and by initiating side; abandoned chains count as not connected |
-| Field — answering rung | escalation chain · answering rung index (§8) | rung 1 / 2 / 3 / none, per connected call (MQ-2) |
-| Field — per-rung answer rate | computed (MQ-3) | feeds M4 and the independence check in §1 |
-| Field — chain length after dedupe | escalation chain · chain length (§8) | 1, 2 or 3 (MQ-4) |
-| Field — chain end state | escalation chain · end state (§8) | Connected / Exhausted / Abandoned (MQ-5) |
-| Field — customer wait before answer or hangup | computed (MQ-8) | time from bridge to answer or disconnect, by rung reached |
-| Check — grain guard | — | ticket-level and call-level figures are never shown in the same comparison |
+§6 states what the shipped system must be able to answer. Where those answers are read — dashboard, report or query — is the implementer's, not this spec's.
 
 ---
 
@@ -321,7 +304,6 @@ What the platform must be able to do for this feature to exist. Whether these ar
 | §1 M3 target | "≥ 69.0% — any gain is upside; a fall below baseline is a regression" | PM said install is in scope because any extra gain is welcome, which implies no committed target. The no-regression floor is inferred, not stated. |
 | §3a precedence 3 | A ticket closing mid-chain does not stop the chain | Default. Not discussed; the alternative (yanking a ringing call) seemed clearly worse. |
 | §3b T8 | Failure envelope — degrade to executor-only when the rung list cannot be resolved | Default. PM did not state behaviour when the role lookup fails. |
-| §4 | The whole IVR ops dashboard block | Inferred from §6: MQ-2 to MQ-5 and MQ-8 must be readable somewhere, and the Phase-1 dashboard is where connect rate is already read. |
 | §5 C-04 | Kill switch, and Eng as joint owner | Default. No rollback control was discussed; a cohort-wide behaviour change normally needs one. |
 | §6 MQ-8 | Customer wait before answer or hangup | Inferred. Ring durations are out of scope, but the abandonment risk they create still needs measuring. |
 | §7 | The whole example dataset — `CSP-4412`, Ravi, Anil, Suresh, Meena, `TKT-88231`, the numbers and the 12 Aug 2026 date | Invented. ACs need concrete data to be executable. Replace with a real CSP and ticket if you want these runnable as-is. |
@@ -334,5 +316,5 @@ What the platform must be able to do for this feature to exist. Whether these ar
 |---|---|---|---|
 | §5 — every number that could change gets a C-id, including customer-experience latency targets even where engineering owns them | Per-rung ring duration and the total ringing the customer hears are **not** C-ids and appear nowhere in §5 | Ring behaviour is Exotel App Bazaar applet configuration, not a parameter of this service. Consistent with the June 2026 decision to drop `ES_CSPIVR_CALL_BRIDGE_MAX_RING_SECONDS` from the IVR spec for the same reason. Customer wait is still measured via MQ-8. | Ashish Raj (PM), 3 Aug 2026 |
 | Header — name consulted parties by domain | No consulted parties are named; the header carries Owner, Reviewer, Status, Sign-off and Version only | PM removed all three consulted slots. The spec changes no other team's surface: it reads existing partner-role data and dials through the existing telephony integration. | Ashish Raj (PM), 3 Aug 2026 |
-| §4 — every screen block names a master design file | No design file; §4 states that no customer-facing or partner-facing screen changes | G1 requires the chain be invisible, so there is nothing to design. The one screen block is an internal ops view. | Ashish Raj (PM), 3 Aug 2026 |
+| §4 — one block per screen the feature touches, internal screens included, each with states, freshness, an elements table and a design link | §4 carries no screen block at all — only a statement that the feature has no screen | The feature is invisible by design (G1), so no app screen changes. An internal ops view was drafted and removed at the PM's instruction: §6 already states what the system must answer, and where those answers are read is the implementer's. | Ashish Raj (PM), 4 Aug 2026 |
 | §1 — "what does the customer see between two windows" | No in-between state specified | This spec owns no clocks, so no gap between windows exists. | Ashish Raj (PM), 3 Aug 2026 |
